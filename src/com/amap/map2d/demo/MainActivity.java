@@ -32,8 +32,6 @@ import com.amap.map2d.demo.overlay.GroundOverlayActivity;
 import com.amap.map2d.demo.overlay.MarkerActivity;
 import com.amap.map2d.demo.overlay.PolygonActivity;
 import com.amap.map2d.demo.overlay.PolylineActivity;
-import com.amap.map2d.demo.poisearch.PoiAroundSearchActivity;
-import com.amap.map2d.demo.poisearch.PoiKeywordSearchActivity;
 import com.amap.map2d.demo.route.RouteActivity;
 import com.amap.map2d.demo.view.FeatureView;
 
@@ -119,12 +117,12 @@ public final class MainActivity extends ListActivity {
 			new DemoDetails(R.string.locationSensorGPS_demo,
 					R.string.locationSensorGPS_demo_description,
 					LocationSensorSourceActivity.class),
-			new DemoDetails(R.string.poikeywordsearch_demo,
-					R.string.poikeywordsearch_description,
-					PoiKeywordSearchActivity.class),
-			new DemoDetails(R.string.poiaroundsearch_demo,
-					R.string.poiaroundsearch_description,
-					PoiAroundSearchActivity.class),
+//			new DemoDetails(R.string.poikeywordsearch_demo,
+//					R.string.poikeywordsearch_description,
+//					PoiKeywordSearchActivity.class),
+//			new DemoDetails(R.string.poiaroundsearch_demo,
+//					R.string.poiaroundsearch_description,
+//					PoiAroundSearchActivity.class),
 			new DemoDetails(R.string.busline_demo,
 					R.string.busline_description, BuslineActivity.class),
 			new DemoDetails(R.string.route_demo, R.string.route_description,
