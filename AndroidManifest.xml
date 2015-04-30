@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.amap.map2d.demo"
+    package="com.tiger.mobile.amap"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -38,7 +38,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize" /> 
         -->
 
-        <activity android:name="com.amap.map2d.demo.MainActivity" >
+        <activity android:name="com.tiger.mobile.amap.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -46,39 +46,39 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".basic.BasicMapActivity"
+            android:name="com.tiger.mobile.amap.activity.BasicMapActivity"
             android:label="@string/basic_map"
             android:screenOrientation="portrait" />
          <activity
-            android:name=".basic.OsmMapActivity"
+            android:name="com.tiger.mobile.amap.activity.OsmMapActivity"
             android:label="@string/osm_map"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".basic.BaseMapFragmentActivity"
+            android:name="com.tiger.mobile.amap.activity.BaseMapFragmentActivity"
             android:label="@string/base_fragment_map"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".basic.CameraActivity"
+            android:name="com.tiger.mobile.amap.activity.CameraActivity"
             android:label="@string/camera_demo"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".basic.EventsActivity"
+            android:name="com.tiger.mobile.amap.activity.EventsActivity"
             android:label="@string/events_demo"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".basic.LayersActivity"
+            android:name="com.tiger.mobile.amap.activity.LayersActivity"
             android:label="@string/layers_demo"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".basic.MapOptionActivity"
+            android:name="com.tiger.mobile.amap.activity.MapOptionActivity"
             android:label="@string/mapOption_demo"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".basic.ScreenShotActivity"
+            android:name="com.tiger.mobile.amap.activity.ScreenShotActivity"
             android:label="@string/screenshot_demo"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".basic.UiSettingsActivity"
+            android:name="com.tiger.mobile.amap.activity.UiSettingsActivity"
             android:label="@string/uisettings_demo"
             android:screenOrientation="portrait" />
         <activity
