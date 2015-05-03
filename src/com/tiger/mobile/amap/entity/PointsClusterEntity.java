@@ -7,6 +7,7 @@ import java.util.List;
 import android.graphics.Point;
 
 import com.amap.api.maps2d.MapView;
+import com.amap.api.maps2d.model.LatLngBounds;
 
 
 /**
@@ -23,7 +24,7 @@ import com.amap.api.maps2d.MapView;
 public class PointsClusterEntity {
 
 	private MapView mapView;
-//	private Envelope boundsEnv;// 创建区域
+	private LatLngBounds boundsEnv;// 创建区域
 	private int clusterCount;
 	private String eventDegree;
 	private Double Lng;
@@ -44,33 +45,33 @@ public class PointsClusterEntity {
 	public PointsClusterEntity(MapView mapView, Point firstMarkers,
 			int gridSize) {
 		this.mapView = mapView;
-		Point point = mapView.toScreenPoint(firstMarkers);
-		Point southwestPoint = new Point(point.getX() - gridSize, point.getY() + gridSize);
-		Point northeastPoint = new Point(point.getX() + gridSize, point.getY() - gridSize);
-		boundsEnv = new Envelope(southwestPoint.getX(), northeastPoint.getY(), 
-				northeastPoint.getX(), southwestPoint.getY());
+//		Point point = mapView.toScreenPoint(firstMarkers);
+//		Point southwestPoint = new Point(point.getX() - gridSize, point.getY() + gridSize);
+//		Point northeastPoint = new Point(point.getX() + gridSize, point.getY() - gridSize);
+//		boundsEnv = new LatLngBounds(southwestPoint.getX(), northeastPoint.getY(), 
+//				northeastPoint.getX(), southwestPoint.getY());
 	}
 
 	/**
 	 * 添加marker
 	 */
 	
-	public Envelope getBoundsEnv() {
+	public LatLngBounds getBoundsEnv() {
 		return boundsEnv;
 	}
 
 	public void setPosition() {
-		int size = subEventEntity.size();
+		int size = subScenicEntity.size();
 		if (size == 1) {
-			this.Lat = subEventEntity.get(0).getLat().doubleValue();
-			this.Lng = subEventEntity.get(0).getLng().doubleValue();
+			this.Lat = subScenicEntity.get(0).getLatLng().latitude;
+			this.Lng = subScenicEntity.get(0).getLatLng().longitude;
 			return;
 		}
 		double lat = 0.0;
 		double lng = 0.0;
-		for (EventReportEntity op : subEventEntity) {
-			lat += op.getLat().doubleValue();
-			lng += op.getLng().doubleValue();
+		for (ScenicModel op : subScenicEntity) {
+			lat += op.getLatLng().latitude;
+			lng += op.getLatLng().longitude;
 		}
 		this.Lat = lat / size;
 		this.Lng = lng / size;// 设置中心位置为聚集点的平均距离

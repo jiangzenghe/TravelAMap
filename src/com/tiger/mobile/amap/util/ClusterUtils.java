@@ -22,7 +22,6 @@ public class ClusterUtils {
 	private int width;// 屏幕宽度(px)
 	private Activity activity;
 	private MapView mapView;
-	private GraphicsLayer commonLayer;
 	/**
 	 * 所有的event
 	 */
@@ -95,7 +94,7 @@ public class ClusterUtils {
 				add2Cluster(fp, clustersEventList);
 			} else {
 				boolean isIn = false;
-				for (EventClusterEntity cluster : clustersEventList) {
+				for (ScenicModel cluster : clustersEventList) {
 					if (cluster.getBoundsEnv().contains(p)) {
 						cluster.setClusterCount(cluster.getClusterCount() + 1);
 						try {
@@ -107,7 +106,7 @@ public class ClusterUtils {
 						} catch (Exception e) {
 							// TODO: handle exception
 						}
-						EventReportEntity object = new EventReportEntity();
+						ScenicModel object = new ScenicModel();
 						object.setBusiUuid(fp.getAttributes().get("BUSI_UUID") + "");
 						object.setEventType(fp.getAttributes().get("EVENT_TYPE") + "");
 						object.setEventDegree(fp.getAttributes().get("SEVERITY_FLAG") + "");
@@ -124,7 +123,7 @@ public class ClusterUtils {
 			}
 		}
 		
-		for (EventClusterEntity eventCluster : clustersEventList) {
+		for (ScenicModel eventCluster : clustersEventList) {
 			eventCluster.setPosition();// 设置聚合点的位置和icon
 		}
 		
@@ -132,16 +131,16 @@ public class ClusterUtils {
 		return clustersEventList;
 	}
 
-	private void add2Cluster(Feature each, ArrayList<EventClusterEntity> eventClustList) {
+	private void add2Cluster(Feature each, ArrayList<ScenicModel> eventClustList) {
 		Point point = (Point)each.getGeometry();
-		EventClusterEntity arg0 = new EventClusterEntity(mapView, point, 
+		ScenicModel arg0 = new ScenicModel(mapView, point, 
 				gridSize);
 		arg0.setClusterCount(1);
 		arg0.setClusterId(eventClustList.size() + 1 + "");
 		arg0.setEventDegree(each.getAttributes().get("SEVERITY_FLAG") + "");
 		
 //		arg0.setEventType(each.getAttributes().get("EVENT_TYPE") + "");
-		EventReportEntity object = new EventReportEntity();
+		ScenicModel object = new ScenicModel();
 		object.setBusiUuid(each.getAttributes().get("BUSI_UUID") + "");
 		object.setEventType(each.getAttributes().get("EVENT_TYPE") + "");
 		object.setEventDegree(each.getAttributes().get("SEVERITY_FLAG") + "");
@@ -151,78 +150,41 @@ public class ClusterUtils {
 		eventClustList.add(arg0);
 	}
 	
-	private void addClusterGrphic(ArrayList<EventClusterEntity> mClusterEventDatas) {
+	private void addClusterGrphic(ArrayList<ScenicModel> mClusterEventDatas) {
 		//test the time to draw
 		Log.e("draw start", new Date().getTime() + "");
 		
-		for (EventClusterEntity each : mClusterEventDatas){
-			// turn feature into graphic
-			PictureMarkerSymbol symbol = new PictureMarkerSymbol(activity, 
-					activity.getResources().getDrawable(R.drawable.cluster_q));
-			if(each.getSubEventEntity().size() == 1) {
-				symbol = Utils
-						.setEventPictureSymbol(activity.getApplicationContext(), each.getSubEventEntity().get(0).getEventType() + 
-								each.getSubEventEntity().get(0).getEventDegree());
-			} else {
-				symbol = setEventDegreeColor(each.getEventDegree());
-			}
-			
-			Map<String, Object> attrContent = new HashMap<String, Object>();
-			attrContent.put("CLUSTER_ID", each.getClusterId());
-			attrContent.put("CLUSTER_COUNT", each.getClusterCount());
-			Point point = new Point(each.getLng(), each.getLat());
-			symbol.setOffsetY(25);
-			Graphic g = new Graphic(point, symbol, attrContent);
-			
-			commonLayer.addGraphic(g);
-			if(each.getClusterCount() > 1) {
-				TextSymbol addtion_symbol = new TextSymbol(16, each.getClusterCount()+"", Color.WHITE, 
-						TextSymbol.HorizontalAlignment.CENTER, TextSymbol.VerticalAlignment.BOTTOM);
-				addtion_symbol.setOffsetY(20);
-				Graphic addtion_g = new Graphic(point, addtion_symbol, attrContent);
-				commonLayer.addGraphic(addtion_g);
-			}
-		}
+//		for (ScenicModel each : mClusterEventDatas){
+//			// turn feature into graphic
+//			PictureMarkerSymbol symbol = new PictureMarkerSymbol(activity, 
+//					activity.getResources().getDrawable(R.drawable.cluster_q));
+//			if(each.getSubEventEntity().size() == 1) {
+//				symbol = Utils
+//						.setEventPictureSymbol(activity.getApplicationContext(), each.getSubEventEntity().get(0).getEventType() + 
+//								each.getSubEventEntity().get(0).getEventDegree());
+//			} else {
+//				symbol = setEventDegreeColor(each.getEventDegree());
+//			}
+//			
+//			Map<String, Object> attrContent = new HashMap<String, Object>();
+//			attrContent.put("CLUSTER_ID", each.getClusterId());
+//			attrContent.put("CLUSTER_COUNT", each.getClusterCount());
+//			Point point = new Point(each.getLng(), each.getLat());
+//			symbol.setOffsetY(25);
+//			Graphic g = new Graphic(point, symbol, attrContent);
+//			
+//			commonLayer.addGraphic(g);
+//			if(each.getClusterCount() > 1) {
+//				TextSymbol addtion_symbol = new TextSymbol(16, each.getClusterCount()+"", Color.WHITE, 
+//						TextSymbol.HorizontalAlignment.CENTER, TextSymbol.VerticalAlignment.BOTTOM);
+//				addtion_symbol.setOffsetY(20);
+//				Graphic addtion_g = new Graphic(point, addtion_symbol, attrContent);
+//				commonLayer.addGraphic(addtion_g);
+//			}
+//		}
 		
 		//test the time to draw
 		Log.e("draw end", new Date().getTime() + "");
-	}
-	
-	//事件等级
-	private PictureMarkerSymbol setEventDegreeColor(String in) {
-		PictureMarkerSymbol symbol = new PictureMarkerSymbol(activity, 
-				activity.getResources().getDrawable(R.drawable.cluster_q));
-		String typeStr = in;
-		try {
-			int type = Integer.parseInt(typeStr);
-			switch (type) {
-			case 1:
-				symbol = new PictureMarkerSymbol(activity, 
-						activity.getResources().getDrawable(R.drawable.cluster_qw));
-				break;
-			case 2:
-				symbol = new PictureMarkerSymbol(activity, 
-						activity.getResources().getDrawable(R.drawable.cluster_q));
-				break;
-			case 3:
-				symbol = new PictureMarkerSymbol(activity, 
-						activity.getResources().getDrawable(R.drawable.cluster_zhong));
-				break;
-			case 4:
-				symbol = new PictureMarkerSymbol(activity, 
-						activity.getResources().getDrawable(R.drawable.cluster_z));
-				break;
-			case 5:
-				symbol = new PictureMarkerSymbol(activity, 
-						activity.getResources().getDrawable(R.drawable.cluster_yz));
-				break;
-			default:
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return symbol;
 	}
 	
 }
