@@ -2,6 +2,7 @@ package com.tiger.mobile.amap;
 
 import java.util.ArrayList;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.graphics.Color;
 import android.location.Location;
@@ -40,14 +41,15 @@ public final class MainActivity extends Activity implements OnCameraChangeListen
 	private ArrayList<PointsClusterEntity> mClusterDatas;
 	private ClusterUtils utils;
 	
-//	utils = new EventClusterUtils(activity, map, gEventLayer, mEventAllDatas);
-//	mClusterEventDatas = utils.resetMarks();
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
-		setTitle("2D地图Demo" + AMap.getVersion());
+		getActionBar().setDisplayShowHomeEnabled(false);
+		ActionBar actionBar = getActionBar();
+		actionBar.setDisplayHomeAsUpEnabled(true);//显示返回箭头
+        actionBar.setDisplayShowHomeEnabled(false); 
+        actionBar.setTitle("个人信息");
 		
 		mapView = (MapView) findViewById(R.id.map);
 		mapView.onCreate(savedInstanceState);// 此方法必须重写
