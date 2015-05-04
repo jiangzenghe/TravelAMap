@@ -1,46 +1,41 @@
 package com.tiger.mobile.amap.util;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import android.app.Activity;
-import android.graphics.Color;
-import android.graphics.Point;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
-import com.amap.api.maps2d.MapView;
-import com.tiger.mobile.amap.R;
+import com.amap.api.maps2d.AMap;
+import com.amap.api.maps2d.model.LatLng;
+import com.amap.api.maps2d.model.Marker;
+import com.amap.api.maps2d.model.MarkerOptions;
+import com.tiger.mobile.amap.entity.PointsClusterEntity;
+import com.tiger.mobile.amap.entity.ScenicModel;
 
 public class ClusterUtils {
 	private int gridSize = 25;
 	private int height;// 屏幕高度(px)
 	private int width;// 屏幕宽度(px)
 	private Activity activity;
-	private MapView mapView;
+	private AMap aMap;
 	/**
-	 * 所有的event
+	 * 所有的point
 	 */
-	ArrayList<Feature> eventOptionsList;
-	/**
-	 * 所有可见的marker&event
-	 */
-	ArrayList<Feature> eventOptionsListInView = new ArrayList<Feature>();
+	ArrayList<ScenicModel> pointsList;
 	
 	Handler handler;
 
-	public ClusterUtils(Activity activity, MapView mapView, GraphicsLayer commonLayer,
-			ArrayList<Feature> eventOptionsList) {
+	public ClusterUtils(Activity activity, AMap aMap,
+			ArrayList<ScenicModel> pointsList) {
 		super();
 		this.activity = activity;
-		this.mapView = mapView;
-		this.commonLayer = commonLayer;
+		this.aMap = aMap;
+//		this.commonLayer = commonLayer;
 		handler = new Handler();
-		this.eventOptionsList = eventOptionsList;
+		this.pointsList = pointsList;
 		DisplayMetrics dm = new DisplayMetrics();
 		activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
 		width = dm.widthPixels;
@@ -48,140 +43,71 @@ public class ClusterUtils {
 	}
 
 	/**
-	 * 获取视野内的event 根据聚合算法合成自定义的event 显示视野内的event
+	 * 获取视野内的  根据聚合算法合成自定义的 显示视野内的
 	 * 
 	 */
-	public ArrayList<EventClusterEntity> resetMarks() {
+	public ArrayList<PointsClusterEntity> resetMarks() {
 		// 自定义的聚合类MarkerCluster
-		ArrayList<EventClusterEntity> clustersEventList = new ArrayList<EventClusterEntity>();
+		ArrayList<PointsClusterEntity> clustersList = new ArrayList<PointsClusterEntity>();
 		// 开始刷新界面
-		eventOptionsListInView.clear();
-		
-		// 获取在当前视野内的event;提高效率
-		for (Feature fp : eventOptionsList) {
-			Point op = (Point)fp.getGeometry();
+		for (ScenicModel fp : pointsList) {
 			
-			if(op == null || !op.isValid()) {
-				continue;
-			}
-			Point p = mapView.toScreenPoint(op);
-			if(p == null) {
-				continue;
-			}
-			
-			if(eventOptionsList.size() > 1000) {
-				if (p.getX() < 0 || p.getY() < 0 || p.getX() > width || p.getY() > height) {
-					// 不添加到计算的列表中
-				} else {
-					eventOptionsListInView.add(fp);
-				}
-			} else {
-				eventOptionsListInView.add(fp);
-			}
-		}
-		
-		for (Feature fp : eventOptionsListInView) {
-			Point op = (Point)fp.getGeometry();
-			if(op == null || !op.isValid()) {
-				continue;
-			}
-			Point p = mapView.toScreenPoint(op);
-			if(p == null) {
-				continue;
-			}
-			
-			if (clustersEventList.size() == 0) {
-				add2Cluster(fp, clustersEventList);
+			if (clustersList.size() == 0) {
+				add2Cluster(fp, clustersList);
 			} else {
 				boolean isIn = false;
-				for (ScenicModel cluster : clustersEventList) {
-					if (cluster.getBoundsEnv().contains(p)) {
+				for (PointsClusterEntity cluster : clustersList) {
+					if (cluster.getBoundsEnv().contains(fp.getLatLng())) {
 						cluster.setClusterCount(cluster.getClusterCount() + 1);
-						try {
-							int lastDegree = Integer.parseInt(cluster.getEventDegree());//已有严重程度值
-							int newDegree = Integer.parseInt(fp.getAttributes().get("SEVERITY_FLAG") + "");//新的严重程度
-							if(lastDegree < newDegree) {
-								cluster.setEventDegree(fp.getAttributes().get("SEVERITY_FLAG") + "");
-							}
-						} catch (Exception e) {
-							// TODO: handle exception
-						}
+						
 						ScenicModel object = new ScenicModel();
-						object.setBusiUuid(fp.getAttributes().get("BUSI_UUID") + "");
-						object.setEventType(fp.getAttributes().get("EVENT_TYPE") + "");
-						object.setEventDegree(fp.getAttributes().get("SEVERITY_FLAG") + "");
-						object.setLat(new BigDecimal(op.getY()));
-						object.setLng(new BigDecimal(op.getX()));
-						cluster.getSubEventEntity().add(object);
+						object.setLatLng(fp.getLatLng());
+						cluster.getSubScenicEntity().add(object);
 						isIn = true;
 						break;
 					}
 				}
 				if (!isIn) {
-					add2Cluster(fp, clustersEventList);
+					add2Cluster(fp, clustersList);
 				}
 			}
 		}
 		
-		for (ScenicModel eventCluster : clustersEventList) {
-			eventCluster.setPosition();// 设置聚合点的位置和icon
+		for (PointsClusterEntity pointCluster : clustersList) {
+			pointCluster.setPosition();// 设置聚合点的位置和icon
 		}
 		
-		addClusterGrphic(clustersEventList);
-		return clustersEventList;
+		addClusterGrphic(clustersList);
+		return clustersList;
 	}
 
-	private void add2Cluster(Feature each, ArrayList<ScenicModel> eventClustList) {
-		Point point = (Point)each.getGeometry();
-		ScenicModel arg0 = new ScenicModel(mapView, point, 
+	private void add2Cluster(ScenicModel each, ArrayList<PointsClusterEntity> normalClustList) {
+		LatLng point = each.getLatLng();
+		PointsClusterEntity arg0 = new PointsClusterEntity(aMap, point, 
 				gridSize);
 		arg0.setClusterCount(1);
-		arg0.setClusterId(eventClustList.size() + 1 + "");
-		arg0.setEventDegree(each.getAttributes().get("SEVERITY_FLAG") + "");
+		arg0.setClusterId(normalClustList.size() + 1 + "");
 		
-//		arg0.setEventType(each.getAttributes().get("EVENT_TYPE") + "");
 		ScenicModel object = new ScenicModel();
-		object.setBusiUuid(each.getAttributes().get("BUSI_UUID") + "");
-		object.setEventType(each.getAttributes().get("EVENT_TYPE") + "");
-		object.setEventDegree(each.getAttributes().get("SEVERITY_FLAG") + "");
-		object.setLat(new BigDecimal(point.getY()));
-		object.setLng(new BigDecimal(point.getX()));
-		arg0.getSubEventEntity().add(object);
-		eventClustList.add(arg0);
+		object.setLatLng(point);
+		arg0.getSubScenicEntity().add(object);
+		normalClustList.add(arg0);
 	}
 	
-	private void addClusterGrphic(ArrayList<ScenicModel> mClusterEventDatas) {
+	private void addClusterGrphic(ArrayList<PointsClusterEntity> mClusterDatas) {
 		//test the time to draw
 		Log.e("draw start", new Date().getTime() + "");
+		ArrayList<Marker> markerList = (ArrayList)aMap.getMapScreenMarkers();
+		if(markerList!=null) {
+			for(Marker each:markerList) {
+				each.remove();
+			}
+		}
 		
-//		for (ScenicModel each : mClusterEventDatas){
-//			// turn feature into graphic
-//			PictureMarkerSymbol symbol = new PictureMarkerSymbol(activity, 
-//					activity.getResources().getDrawable(R.drawable.cluster_q));
-//			if(each.getSubEventEntity().size() == 1) {
-//				symbol = Utils
-//						.setEventPictureSymbol(activity.getApplicationContext(), each.getSubEventEntity().get(0).getEventType() + 
-//								each.getSubEventEntity().get(0).getEventDegree());
-//			} else {
-//				symbol = setEventDegreeColor(each.getEventDegree());
-//			}
-//			
-//			Map<String, Object> attrContent = new HashMap<String, Object>();
-//			attrContent.put("CLUSTER_ID", each.getClusterId());
-//			attrContent.put("CLUSTER_COUNT", each.getClusterCount());
-//			Point point = new Point(each.getLng(), each.getLat());
-//			symbol.setOffsetY(25);
-//			Graphic g = new Graphic(point, symbol, attrContent);
-//			
-//			commonLayer.addGraphic(g);
-//			if(each.getClusterCount() > 1) {
-//				TextSymbol addtion_symbol = new TextSymbol(16, each.getClusterCount()+"", Color.WHITE, 
-//						TextSymbol.HorizontalAlignment.CENTER, TextSymbol.VerticalAlignment.BOTTOM);
-//				addtion_symbol.setOffsetY(20);
-//				Graphic addtion_g = new Graphic(point, addtion_symbol, attrContent);
-//				commonLayer.addGraphic(addtion_g);
-//			}
-//		}
+		for (PointsClusterEntity each : mClusterDatas){
+			MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f).position(new LatLng(each.getLat(), each.getLng()));
+			aMap.addMarker(arg0);
+		}
 		
 		//test the time to draw
 		Log.e("draw end", new Date().getTime() + "");

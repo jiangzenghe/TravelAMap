@@ -6,7 +6,8 @@ import java.util.List;
 
 import android.graphics.Point;
 
-import com.amap.api.maps2d.MapView;
+import com.amap.api.maps2d.AMap;
+import com.amap.api.maps2d.model.LatLng;
 import com.amap.api.maps2d.model.LatLngBounds;
 
 
@@ -23,10 +24,9 @@ import com.amap.api.maps2d.model.LatLngBounds;
  */
 public class PointsClusterEntity {
 
-	private MapView mapView;
+	private AMap aMap;
 	private LatLngBounds boundsEnv;// 创建区域
 	private int clusterCount;
-	private String eventDegree;
 	private Double Lng;
 	private Double Lat;
 	private String text;
@@ -42,14 +42,16 @@ public class PointsClusterEntity {
 		this.text = text;
 	}
 	
-	public PointsClusterEntity(MapView mapView, Point firstMarkers,
+	public PointsClusterEntity(AMap aMap, LatLng firstMarkers,
 			int gridSize) {
-		this.mapView = mapView;
-//		Point point = mapView.toScreenPoint(firstMarkers);
-//		Point southwestPoint = new Point(point.getX() - gridSize, point.getY() + gridSize);
-//		Point northeastPoint = new Point(point.getX() + gridSize, point.getY() - gridSize);
-//		boundsEnv = new LatLngBounds(southwestPoint.getX(), northeastPoint.getY(), 
-//				northeastPoint.getX(), southwestPoint.getY());
+		this.aMap = aMap;
+		Point point = aMap.getProjection().toScreenLocation(firstMarkers);
+		
+		LatLng southwestPoint = aMap.getProjection().fromScreenLocation(new Point(point.x -gridSize, point.y +gridSize));
+//		new LatLng(point.x - gridSize, point.y + gridSize);
+		LatLng northeastPoint = aMap.getProjection().fromScreenLocation(new Point(point.x + gridSize, point.y - gridSize));
+//		new LatLng(point.x + gridSize, point.y - gridSize);
+		boundsEnv = new LatLngBounds(southwestPoint, northeastPoint);
 	}
 
 	/**
@@ -100,14 +102,6 @@ public class PointsClusterEntity {
 
 	public void setLat(Double lat) {
 		Lat = lat;
-	}
-
-	public String getEventDegree() {
-		return eventDegree;
-	}
-
-	public void setEventDegree(String eventDegree) {
-		this.eventDegree = eventDegree;
 	}
 
 	public String getClusterId() {
