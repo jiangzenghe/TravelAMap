@@ -1,0 +1,57 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+	<FrameLayout 
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent">
+	   <com.amap.api.maps2d.MapView 
+	    xmlns:android="http://schemas.android.com/apk/res/android"
+	    android:id="@+id/map"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent" />
+	<LinearLayout 
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:orientation="vertical"
+	    android:layout_gravity="bottom">
+	    
+	     <LinearLayout 
+	        android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal">
+	        <ImageView 
+	            android:layout_width="0dp"
+		    	android:layout_height="match_parent"
+		    	android:layout_weight="1"
+		    	android:src="@drawable/badge_sa"/>
+	        <ImageView 
+	            android:id="@+id/image_done"
+	            android:layout_width="0dp"
+		    	android:layout_height="match_parent"
+		    	android:layout_weight="1"
+		    	android:src="@drawable/badge_wa"/>
+    	</LinearLayout> 
+	    <LinearLayout 
+	        android:id="@+id/layout_show"
+	        android:layout_width="fill_parent"
+		    android:layout_height="50dp"
+		    android:orientation="horizontal"
+		    android:visibility="gone">
+	        <ImageView 
+	            android:layout_width="0dp"
+		    	android:layout_height="match_parent"
+		    	android:layout_weight="1"
+		    	android:src="@drawable/badge_wa"/>
+	        <ImageView 
+	            android:layout_width="0dp"
+		    	android:layout_height="match_parent"
+		    	android:layout_weight="1"
+		    	android:src="@drawable/badge_wa"/>
+	    </LinearLayout> 
+	</LinearLayout>
+   
+	    
+	</FrameLayout>
+    
+</LinearLayout>

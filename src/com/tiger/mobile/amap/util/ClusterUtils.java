@@ -100,13 +100,17 @@ public class ClusterUtils {
 		ArrayList<Marker> markerList = (ArrayList)aMap.getMapScreenMarkers();
 		if(markerList!=null) {
 			for(Marker each:markerList) {
-				each.remove();
+				if(each.getObject() != null && each.getObject().equals("1")) {
+					each.remove();
+				}
 			}
 		}
 		
 		for (PointsClusterEntity each : mClusterDatas){
-			MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f).position(new LatLng(each.getLat(), each.getLng()));
-			aMap.addMarker(arg0);
+			MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f)
+					.position(new LatLng(each.getLat(), each.getLng()));
+			Marker eachMarker = aMap.addMarker(arg0);
+			eachMarker.setObject("1");//1--景点聚合标志
 		}
 		
 		//test the time to draw

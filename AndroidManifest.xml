@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="13"
         android:targetSdkVersion="17" />
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -23,14 +23,14 @@
 
     <application
         android:icon="@drawable/ic_launcher"
-        android:label="@string/demo_title" >
+        android:theme="@style/AppTheme" >
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="612cf2f11d8e6118664d759fc14d7082" />
 
         <!--
-         在android4.0以上系统中的 Activity加上下面这句，可以支持地图横竖屏切换 
-         android:configChanges="orientation|keyboardHidden|screenSize"
+        	 在android4.0以上系统中的 Activity加上下面这句，可以支持地图横竖屏切换 
+         	android:configChanges="orientation|keyboardHidden|screenSize"
                                例如：
          <activity
             android:name=".basic.BasicMapActivity"
@@ -38,7 +38,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize" /> 
         -->
 
-        <activity android:name="com.tiger.mobile.amap.MainActivity" >
+        <activity android:name="com.tiger.mobile.amap.activity.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -46,102 +46,25 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.tiger.mobile.amap.activity.BasicMapActivity"
+            android:name="com.tiger.mobile.amap.activity.MapActivity"
             android:label="@string/basic_map"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.tiger.mobile.amap.activity.QueryCityActivity"
             android:screenOrientation="portrait" />
          <activity
             android:name="com.tiger.mobile.amap.activity.OsmMapActivity"
             android:label="@string/osm_map"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.tiger.mobile.amap.activity.BaseMapFragmentActivity"
-            android:label="@string/base_fragment_map"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name="com.tiger.mobile.amap.activity.CameraActivity"
-            android:label="@string/camera_demo"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name="com.tiger.mobile.amap.activity.EventsActivity"
-            android:label="@string/events_demo"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name="com.tiger.mobile.amap.activity.LayersActivity"
-            android:label="@string/layers_demo"
-            android:screenOrientation="portrait" />
-        <activity
             android:name="com.tiger.mobile.amap.activity.MapOptionActivity"
             android:label="@string/mapOption_demo"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name="com.tiger.mobile.amap.activity.ScreenShotActivity"
-            android:label="@string/screenshot_demo"
             android:screenOrientation="portrait" />
         <activity
             android:name="com.tiger.mobile.amap.activity.UiSettingsActivity"
             android:label="@string/uisettings_demo"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".overlay.MarkerActivity"
-            android:label="@string/marker_demo"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".overlay.PolylineActivity"
-            android:label="@string/polyline_demo"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".overlay.GroundOverlayActivity"
-            android:label="@string/groundoverlay_demo"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".overlay.PolygonActivity"
-            android:label="@string/polygon_demo"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".overlay.CircleActivity"
-            android:label="@string/circle_demo"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".location.LocationSourceActivity"
-            android:label="@string/locationsource_demo"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".location.LocationGPSActivity"
-            android:label="@string/locationGPS_demo"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".location.LocationSensorSourceActivity"
-            android:label="@string/locationSensorGPS_demo"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".location.LocationNetworkActivity"
-            android:label="@string/locationNetwork_demo"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".geocoder.GeocoderActivity"
-            android:label="@string/geocoder_demo"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".route.RouteActivity"
-            android:label="@string/route_demo"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".busline.BuslineActivity"
-            android:label="@string/busline_demo"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".poisearch.PoiKeywordSearchActivity"
-            android:label="@string/poikeywordsearch_demo" 
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".poisearch.PoiAroundSearchActivity"
-            android:label="@string/poiaroundsearch_demo" 
-            android:screenOrientation="portrait"/>
         
-        <activity
-            android:name=".district.DistrictActivity"
-            android:label="@string/district_demo" 
-            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>

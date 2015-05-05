@@ -1,12 +1,15 @@
-package com.tiger.mobile.amap;
+package com.tiger.mobile.amap.activity;
 
 import java.util.ArrayList;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationListener;
@@ -15,12 +18,15 @@ import com.amap.api.location.LocationProviderProxy;
 import com.amap.api.maps2d.AMap;
 import com.amap.api.maps2d.AMap.OnCameraChangeListener;
 import com.amap.api.maps2d.AMap.OnMapLoadedListener;
+import com.amap.api.maps2d.AMap.OnMarkerClickListener;
 import com.amap.api.maps2d.LocationSource;
 import com.amap.api.maps2d.MapView;
 import com.amap.api.maps2d.model.BitmapDescriptorFactory;
 import com.amap.api.maps2d.model.CameraPosition;
+import com.amap.api.maps2d.model.Marker;
 import com.amap.api.maps2d.model.MyLocationStyle;
 import com.amap.api.maps2d.model.VisibleRegion;
+import com.tiger.mobile.amap.R;
 import com.tiger.mobile.amap.entity.PointsClusterEntity;
 import com.tiger.mobile.amap.entity.ScenicModel;
 import com.tiger.mobile.amap.util.CityScenicUtils;
@@ -30,7 +36,7 @@ import com.tiger.mobile.amap.util.ClusterUtils;
  * AMapV1地图demo总汇
  */
 public final class MainActivity extends Activity implements OnCameraChangeListener, OnMapLoadedListener,
-	LocationSource, AMapLocationListener {
+	LocationSource, AMapLocationListener, OnMarkerClickListener {
 
 	private AMap mMap;
 	private MapView mapView;
@@ -45,18 +51,34 @@ public final class MainActivity extends Activity implements OnCameraChangeListen
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main_activity);
-		getActionBar().setDisplayShowHomeEnabled(false);
 		ActionBar actionBar = getActionBar();
-		actionBar.setDisplayHomeAsUpEnabled(true);//显示返回箭头
+		actionBar.setDisplayHomeAsUpEnabled(false);//显示返回箭头
         actionBar.setDisplayShowHomeEnabled(false); 
-        actionBar.setTitle("个人信息");
-		
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle("烟台");
 		mapView = (MapView) findViewById(R.id.map);
 		mapView.onCreate(savedInstanceState);// 此方法必须重写
-		
-		init();
 	}
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {  
+	    case R.id.action_query:  
+	       // 查询
+	    	Intent intent2 =new Intent(MainActivity.this,QueryCityActivity.class);
+	    	startActivity(intent2);
+	        return true;  
+	    default:  
+	        return super.onOptionsItemSelected(item);  
+	    }
+	}
+	
 	/**
 	 * 初始化AMap对象
 	 */
@@ -69,6 +91,7 @@ public final class MainActivity extends Activity implements OnCameraChangeListen
 			setUpMap();
 			mMap.setOnCameraChangeListener(this);
 			mMap.setOnMapLoadedListener(this);
+			mMap.setOnMarkerClickListener(this);// 设置点击marker事件监听器
 		}
 		
 		//test
@@ -184,6 +207,7 @@ public final class MainActivity extends Activity implements OnCameraChangeListen
 	protected void onResume() {
 		super.onResume();
 		mapView.onResume();
+		init();//必须写在这里
 	}
 
 	/**
@@ -242,5 +266,15 @@ public final class MainActivity extends Activity implements OnCameraChangeListen
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public boolean onMarkerClick(Marker arg0) {
+		if(arg0.getObject().equals("1")) {
+			Intent intent = new Intent(MainActivity.this, MapActivity.class);
+			startActivity(intent);
+		}
+		
+		return false;
 	}
 }
