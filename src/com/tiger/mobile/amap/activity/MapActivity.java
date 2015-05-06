@@ -10,8 +10,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
-import android.widget.ImageView;
+import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationListener;
@@ -20,6 +21,7 @@ import com.amap.api.location.LocationProviderProxy;
 import com.amap.api.maps2d.AMap;
 import com.amap.api.maps2d.AMap.OnCameraChangeListener;
 import com.amap.api.maps2d.AMap.OnMapLoadedListener;
+import com.amap.api.maps2d.AMapOptions;
 import com.amap.api.maps2d.CameraUpdateFactory;
 import com.amap.api.maps2d.LocationSource;
 import com.amap.api.maps2d.MapView;
@@ -41,8 +43,8 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 
 	private AMap mMap;
 	private MapView mapView;
-	private ImageView cilckImage;
-	private LinearLayout layoutShow;
+	private TextView cilckText;
+	private GridView layoutShow;
 	private OnLocationChangedListener mListener;
 	private LocationManagerProxy mAMapLocationManager;
 	private TileOverlay tileOverlay;
@@ -58,24 +60,41 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 		mapView = (MapView) findViewById(R.id.map);
 		mapView.onCreate(savedInstanceState);// 此方法必须重写
 		
-		cilckImage = (ImageView) findViewById(R.id.image_done);
-		layoutShow = (LinearLayout) findViewById(R.id.layout_show);
-		cilckImage.setOnTouchListener(new View.OnTouchListener() {
+		cilckText = (TextView) findViewById(R.id.help);
+		layoutShow = (GridView) findViewById(R.id.layout_show);
+//		layoutShow.setVisibility(View.VISIBLE);
+		cilckText.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				TranslateAnimation mShowAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,     
-		                Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,     
-		                -1.0f, Animation.RELATIVE_TO_SELF, 0.0f);     
-		        mShowAction.setDuration(500); 
-				layoutShow.setVisibility(View.VISIBLE);
-				layoutShow.setAnimation(mShowAction);
-				return true;
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if(layoutShow.getVisibility() == View.VISIBLE) {
+					TranslateAnimation mHideAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,     
+							Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,     
+							0.0f, Animation.RELATIVE_TO_SELF, 1.0f);  
+					mHideAction.setDuration(50); 
+					layoutShow.setAnimation(mHideAction);
+					layoutShow.setVisibility(View.GONE);
+				} else {
+					TranslateAnimation mShowAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,     
+							Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,     
+							1.0f, Animation.RELATIVE_TO_SELF, 0.0f);  
+					mShowAction.setDuration(50); 
+					layoutShow.setAnimation(mShowAction);
+					layoutShow.setVisibility(View.VISIBLE);
+				}
 			}
 		});
 		
 	}
 
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		float a = 1.0f;
+		
+		return false;
+	}
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -96,6 +115,8 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 			setUpMap();
 			mMap.setOnCameraChangeListener(this);
 			mMap.setOnMapLoadedListener(this);
+			mMap.getUiSettings().setCompassEnabled(true);
+			mMap.getUiSettings().setZoomPosition(AMapOptions.ZOOM_POSITION_RIGHT_CENTER);
 		}
 		
 	}
@@ -179,10 +200,6 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
         		.zIndex(-10));
 		tileOverlay.setVisible(true);
 		
-		mMap.getUiSettings().setCompassEnabled(true);
-		
-		
-	 
 	}
 	
 	@Override

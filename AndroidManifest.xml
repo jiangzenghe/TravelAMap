@@ -60,10 +60,6 @@
             android:name="com.tiger.mobile.amap.activity.MapOptionActivity"
             android:label="@string/mapOption_demo"
             android:screenOrientation="portrait" />
-        <activity
-            android:name="com.tiger.mobile.amap.activity.UiSettingsActivity"
-            android:label="@string/uisettings_demo"
-            android:screenOrientation="portrait" />
         
     </application>
 
