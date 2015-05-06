@@ -116,7 +116,8 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 			mMap.setOnCameraChangeListener(this);
 			mMap.setOnMapLoadedListener(this);
 			mMap.getUiSettings().setCompassEnabled(true);
-			mMap.getUiSettings().setZoomPosition(AMapOptions.ZOOM_POSITION_RIGHT_CENTER);
+			mMap.getUiSettings().setZoomControlsEnabled(false);
+//			mMap.getUiSettings().setZoomPosition(AMapOptions.ZOOM_POSITION_RIGHT_CENTER);
 		}
 		
 	}
