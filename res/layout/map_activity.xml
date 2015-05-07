@@ -17,23 +17,44 @@
 	    android:background="@color/color_white"
 	    android:layout_gravity="bottom">
 	    
-	    <com.tiger.mobile.amap.view.ColumnHorizontalScrollView
-            android:id="@+id/mColumnHorizontalScrollView"
+	    <RelativeLayout
+            android:id="@+id/rl_column"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:scrollbars="none"
-            android:visibility="gone" >
-
-            <LinearLayout
-                android:id="@+id/layout_route"
-                android:layout_width="fill_parent"
-                android:layout_height="50dp"
-                android:layout_centerVertical="true"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp" />
-        </com.tiger.mobile.amap.view.ColumnHorizontalScrollView>
+            android:layout_height="40.0dip"
+            android:layout_weight="1.0" >
+            
+		    <com.tiger.mobile.amap.view.ColumnHorizontalScrollView
+	            android:id="@+id/mColumnHorizontalScrollView"
+	            android:layout_width="match_parent"
+	            android:layout_height="50dp"
+	            android:scrollbars="none"
+	            android:visibility="gone" >
+	
+	            <LinearLayout
+	                android:id="@+id/layout_route"
+	                android:layout_width="fill_parent"
+	                android:layout_height="50dp"
+	                android:layout_centerVertical="true"
+	                android:gravity="center_vertical"
+	                android:orientation="horizontal"
+	                android:paddingLeft="10dp"
+	                android:paddingRight="10dp" />
+	        </com.tiger.mobile.amap.view.ColumnHorizontalScrollView>
+	        <ImageView
+	                android:id="@+id/shade_left"
+	                android:layout_width="10.0dip"
+	                android:layout_height="40.0dip"
+	                android:layout_alignParentLeft="true"
+	                android:layout_centerVertical="true" />
+	
+	        <ImageView
+	            android:id="@+id/shade_right"
+	            android:layout_width="10.0dip"
+	            android:layout_height="40.0dip"
+	            android:layout_alignParentRight="true"
+	            android:layout_centerVertical="true"
+	            android:visibility="visible" />
+        </RelativeLayout>
 		<LinearLayout 
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"

@@ -16,7 +16,9 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.amap.api.location.AMapLocation;
@@ -57,6 +59,13 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 	private TileOverlay tileOverlay;
 	private ColumnHorizontalScrollView mColumnHorizontalScrollView;
 	private LinearLayout mRoute_layout;
+	private RelativeLayout rl_column;
+	/** 当前选中的栏目*/
+	private int columnSelectIndex = 0;
+	/** 左阴影部分*/
+	public ImageView shade_left;
+	/** 右阴影部分 */
+	public ImageView shade_right;
 	
 	/** 分类列表*/
 	private ArrayList<String> routeList=new ArrayList<String>();
@@ -84,6 +93,9 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 		routeList.add("点3");
 		routeList.add("点4");
 		
+		rl_column = (RelativeLayout) findViewById(R.id.rl_column);
+		shade_left = (ImageView) findViewById(R.id.shade_left);
+		shade_right = (ImageView) findViewById(R.id.shade_right);
 		mRoute_layout = (LinearLayout) findViewById(R.id.layout_route);
 		mColumnHorizontalScrollView = (ColumnHorizontalScrollView) findViewById(R.id.mColumnHorizontalScrollView);
 		cilckText = (TextView) findViewById(R.id.help);
@@ -141,7 +153,7 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 	private void initColumn() {
 		mRoute_layout.removeAllViews();
 		int count =  routeList.size();
-//		mColumnHorizontalScrollView.setParam(this, mScreenWidth, mRoute_layout, shade_left, shade_right, rl_column);
+		mColumnHorizontalScrollView.setParam(this, mScreenWidth, mRoute_layout, shade_left, shade_right, rl_column);
 		for(int i = 0; i< count; i++){
 			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mItemWidth , LayoutParams.WRAP_CONTENT);
 			params.leftMargin = 5;
@@ -151,6 +163,9 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 			columnTextView.setPadding(5, 5, 5, 5);
 			columnTextView.setId(i);
 			columnTextView.setText(routeList.get(i));
+			if(columnSelectIndex == i){
+				columnTextView.setSelected(true);
+			}
 			mRoute_layout.addView(columnTextView, i ,params);
 		}
 	}
