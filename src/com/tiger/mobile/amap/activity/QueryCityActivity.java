@@ -10,15 +10,21 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.tiger.mobile.amap.R;
+import com.tiger.mobile.amap.entity.City;
+import com.tiger.mobile.amap.util.CityScenicUtils;
 import com.tiger.mobile.amap.view.IndexBarView;
 import com.tiger.mobile.amap.view.PinnedHeaderListView;
 import com.tiger.mobile.amap.view.filterlistviewhelp.PinnedHeaderAdapter;
@@ -36,42 +42,43 @@ import com.tiger.mobile.amap.view.filterlistviewhelp.PinnedHeaderAdapter;
 public class QueryCityActivity extends Activity{
 	
 	// an array of countries to display in the list
-		static final String[] ITEMS = new String[] { "East Timor", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea",
-				"Eritrea", "Estonia", "Ethiopia", "Faeroe Islands", "Falkland Islands", "Fiji", "Finland", "Afghanistan",
-				"Albania", "Algeria", "American Samoa", "Andorra", "Angola", "Anguilla", "Antarctica",
-				"Antigua and Barbuda", "Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", "Bahrain",
-				"Bangladesh", "Barbados", "Belarus", "Belgium", "Monaco", "Mongolia", "Montserrat", "Morocco",
-				"Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "Netherlands Antilles",
-				"New Caledonia", "New Zealand", "Guyana", "Haiti", "Heard Island and McDonald Islands", "Honduras",
-				"Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy",
-				"Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia",
-				"Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Nicaragua", "Niger",
-				"Nigeria", "Niue", "Norfolk Island", "North Korea", "Northern Marianas", "Norway", "Oman", "Pakistan",
-				"Palau", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Pitcairn Islands", "Poland",
-				"Portugal", "Puerto Rico", "Qatar", "French Southern Territories", "Gabon", "Georgia", "Germany", "Ghana",
-				"Gibraltar", "Greece", "Greenland", "Grenada", "Guadeloupe", "Guam", "Guatemala", "Guinea",
-				"Guinea-Bissau", "Martinique", "Mauritania", "Mauritius", "Mayotte", "Mexico", "Micronesia", "Moldova",
-				"Bosnia and Herzegovina", "Botswana", "Bouvet Island", "Brazil", "British Indian Ocean Territory",
-				"Saint Vincent and the Grenadines", "Samoa", "San Marino", "Saudi Arabia", "Senegal", "Seychelles",
-				"Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa",
-				"South Georgia and the South Sandwich Islands", "South Korea", "Spain", "Sri Lanka", "Sudan", "Suriname",
-				"Svalbard and Jan Mayen", "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan",
-				"Tanzania", "Thailand", "The Bahamas", "The Gambia", "Togo", "Tokelau", "Tonga", "Trinidad and Tobago",
-				"Tunisia", "Turkey", "Turkmenistan", "Turks and Caicos Islands", "Tuvalu", "Uganda", "Ukraine",
-				"United Arab Emirates", "United Kingdom", "United States", "United States Minor Outlying Islands",
-				"Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Virgin Islands",
-				"Wallis and Futuna", "Western Sahara", "British Virgin Islands", "Brunei", "Bulgaria", "Burkina Faso",
-				"Burundi", "Cote d'Ivoire", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Cayman Islands",
-				"Central African Republic", "Chad", "Chile", "China", "Reunion", "Romania", "Russia", "Rwanda",
-				"Sqo Tome and Principe", "Saint Helena", "Saint Kitts and Nevis", "Saint Lucia",
-				"Saint Pierre and Miquelon", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Christmas Island",
-				"Cocos (Keeling) Islands", "Colombia", "Comoros", "Congo", "Cook Islands", "Costa Rica", "Croatia", "Cuba",
-				"Cyprus", "Czech Republic", "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica",
-				"Dominican Republic", "Former Yugoslav Republic of Macedonia", "France", "French Guiana",
-				"French Polynesia", "Macau", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta",
-				"Marshall Islands", "Yemen", "Yugoslavia", "Zambia", "Zimbabwe" };
-
-		// unsorted list items
+//		static final String[] ITEMS = new String[] { "East Timor", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea",
+//				"Eritrea", "Estonia", "Ethiopia", "Faeroe Islands", "Falkland Islands", "Fiji", "Finland", "Afghanistan",
+//				"Albania", "Algeria", "American Samoa", "Andorra", "Angola", "Anguilla", "Antarctica",
+//				"Antigua and Barbuda", "Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", "Bahrain",
+//				"Bangladesh", "Barbados", "Belarus", "Belgium", "Monaco", "Mongolia", "Montserrat", "Morocco",
+//				"Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "Netherlands Antilles",
+//				"New Caledonia", "New Zealand", "Guyana", "Haiti", "Heard Island and McDonald Islands", "Honduras",
+//				"Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy",
+//				"Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia",
+//				"Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Nicaragua", "Niger",
+//				"Nigeria", "Niue", "Norfolk Island", "North Korea", "Northern Marianas", "Norway", "Oman", "Pakistan",
+//				"Palau", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Pitcairn Islands", "Poland",
+//				"Portugal", "Puerto Rico", "Qatar", "French Southern Territories", "Gabon", "Georgia", "Germany", "Ghana",
+//				"Gibraltar", "Greece", "Greenland", "Grenada", "Guadeloupe", "Guam", "Guatemala", "Guinea",
+//				"Guinea-Bissau", "Martinique", "Mauritania", "Mauritius", "Mayotte", "Mexico", "Micronesia", "Moldova",
+//				"Bosnia and Herzegovina", "Botswana", "Bouvet Island", "Brazil", "British Indian Ocean Territory",
+//				"Saint Vincent and the Grenadines", "Samoa", "San Marino", "Saudi Arabia", "Senegal", "Seychelles",
+//				"Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa",
+//				"South Georgia and the South Sandwich Islands", "South Korea", "Spain", "Sri Lanka", "Sudan", "Suriname",
+//				"Svalbard and Jan Mayen", "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan",
+//				"Tanzania", "Thailand", "The Bahamas", "The Gambia", "Togo", "Tokelau", "Tonga", "Trinidad and Tobago",
+//				"Tunisia", "Turkey", "Turkmenistan", "Turks and Caicos Islands", "Tuvalu", "Uganda", "Ukraine",
+//				"United Arab Emirates", "United Kingdom", "United States", "United States Minor Outlying Islands",
+//				"Uruguay", "Uzbekistan", "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Virgin Islands",
+//				"Wallis and Futuna", "Western Sahara", "British Virgin Islands", "Brunei", "Bulgaria", "Burkina Faso",
+//				"Burundi", "Cote d'Ivoire", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Cayman Islands",
+//				"Central African Republic", "Chad", "Chile", "China", "Reunion", "Romania", "Russia", "Rwanda",
+//				"Sqo Tome and Principe", "Saint Helena", "Saint Kitts and Nevis", "Saint Lucia",
+//				"Saint Pierre and Miquelon", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Christmas Island",
+//				"Cocos (Keeling) Islands", "Colombia", "Comoros", "Congo", "Cook Islands", "Costa Rica", "Croatia", "Cuba",
+//				"Cyprus", "Czech Republic", "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica",
+//				"Dominican Republic", "Former Yugoslav Republic of Macedonia", "France", "French Guiana",
+//				"French Polynesia", "Macau", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta",
+//				"Marshall Islands", "Yemen", "Yugoslavia", "Zambia", "Zimbabwe" };
+		ArrayList<City> original_items;
+		
+		// unsorted list items pinyin
 		ArrayList<String> mItems;
 
 		// array list to store section positions
@@ -79,6 +86,9 @@ public class QueryCityActivity extends Activity{
 
 		// array list to store listView data
 		ArrayList<String> mListItems;
+		
+		// array list to store listView data pinyin
+		ArrayList<String> mListShowItems;
 
 		// custom list view with pinned header
 		PinnedHeaderListView mListView;
@@ -101,20 +111,26 @@ public class QueryCityActivity extends Activity{
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);// 显示返回箭头
 		actionBar.setDisplayShowHomeEnabled(false);	
-		
+		actionBar.setTitle("选择城市");
 		// UI elements
 		setupViews();
 
+		original_items = CityScenicUtils.createCities();
 		// Array to ArrayList
-		mItems = new ArrayList<String>(Arrays.asList(ITEMS));
+//		mItems = new ArrayList<String>(Arrays.asList(ITEMS));
+		mItems = new ArrayList<String>();
+		for(City each:original_items) {
+			mItems.add(each.getCityPY());
+		}
 		mListSectionPos = new ArrayList<Integer>();
 		mListItems = new ArrayList<String>();
+		mListShowItems = new ArrayList<String>();
 
 		// for handling configuration change
 		if (savedInstanceState != null) {
 			mListItems = savedInstanceState.getStringArrayList("mListItems");
 			mListSectionPos = savedInstanceState.getIntegerArrayList("mListSectionPos");
-
+			mListShowItems = savedInstanceState.getStringArrayList("mListShowItems");
 			if (mListItems != null && mListItems.size() > 0 && mListSectionPos != null && mListSectionPos.size() > 0) {
 				setListAdaptor();
 			}
@@ -130,12 +146,42 @@ public class QueryCityActivity extends Activity{
 	}
 	
 	private void setupViews() {
-		setContentView(R.layout.activity_node_list);
-//		mSearchView = (EditText) findViewById(R.id.search_view);
-//		mLoadingView = (ProgressBar) findViewById(R.id.loading_view);
-//		mListView = (PinnedHeaderListView) findViewById(R.id.list_view);
-//		mEmptyView = (TextView) findViewById(R.id.empty_view);
+		setContentView(R.layout.main_act);
+		mSearchView = (EditText) findViewById(R.id.search_view);
+		mLoadingView = (ProgressBar) findViewById(R.id.loading_view);
+		mListView = (PinnedHeaderListView) findViewById(R.id.list_view);
+		mEmptyView = (TextView) findViewById(R.id.empty_view);
+		mListView.setOnItemClickListener(new OnItemClickListener(){
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				finish();
+			}
+			
+		});
 	}
+	
+	@Override
+	protected void onPostCreate(Bundle savedInstanceState) {
+		mSearchView.addTextChangedListener(filterTextWatcher);
+		super.onPostCreate(savedInstanceState);
+	}
+	
+	private TextWatcher filterTextWatcher = new TextWatcher() {
+		public void afterTextChanged(Editable s) {
+			String str = s.toString();
+			if (mAdaptor != null && str != null)
+				mAdaptor.getFilter().filter(str);
+		}
+
+		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+		}
+
+		public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+		}
+	};
 	
 	public class ListFilter extends Filter {
 		@Override
@@ -152,6 +198,9 @@ public class QueryCityActivity extends Activity{
 				synchronized (this) {
 					for (String item : mItems) {
 						if (item.toLowerCase(Locale.getDefault()).startsWith(constraintStr)) {
+							filterItems.add(item);
+						}
+						if(getCityName(item).contains(constraintStr)) {
 							filterItems.add(item);
 						}
 					}
@@ -219,6 +268,7 @@ public class QueryCityActivity extends Activity{
 		@Override
 		protected Void doInBackground(ArrayList<String>... params) {
 			mListItems.clear();
+			mListShowItems.clear();
 			mListSectionPos.clear();
 			ArrayList<String> items = params[0];
 			if (mItems.size() > 0) {
@@ -228,16 +278,20 @@ public class QueryCityActivity extends Activity{
 
 				String prev_section = "";
 				for (String current_item : items) {
+//					String current_item = current_city.getPName();
 					String current_section = current_item.substring(0, 1).toUpperCase(Locale.getDefault());
 
 					if (!prev_section.equals(current_section)) {
 						mListItems.add(current_section);
 						mListItems.add(current_item);
+						mListShowItems.add(current_section);
+						mListShowItems.add(getCityName(current_item));
 						// array list of section positions
 						mListSectionPos.add(mListItems.indexOf(current_section));
 						prev_section = current_section;
 					} else {
 						mListItems.add(current_item);
+						mListShowItems.add(getCityName(current_item));
 					}
 				}
 			}
@@ -256,11 +310,23 @@ public class QueryCityActivity extends Activity{
 			}
 			super.onPostExecute(result);
 		}
+		
+	}
+	
+	private String getCityName(String pinyin) {
+		String result = "";
+		for(City each: original_items) {
+			if(each.getCityPY().equals(pinyin)) {
+				result = each.getCityName();
+				break;
+			}
+		}
+		return result;
 	}
 	
 	private void setListAdaptor() {
 		// create instance of PinnedHeaderAdapter and set adapter to list view
-		mAdaptor = new PinnedHeaderAdapter(this, mListItems, mListSectionPos);
+		mAdaptor = new PinnedHeaderAdapter(this, mListItems, mListShowItems, mListSectionPos);
 		mListView.setAdapter(mAdaptor);
 
 		LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -303,6 +369,9 @@ public class QueryCityActivity extends Activity{
 	protected void onSaveInstanceState(Bundle outState) {
 		if (mListItems != null && mListItems.size() > 0) {
 			outState.putStringArrayList("mListItems", mListItems);
+		}
+		if (mListShowItems != null && mListShowItems.size() > 0) {
+			outState.putStringArrayList("mListShowItems", mListShowItems);
 		}
 		if (mListSectionPos != null && mListSectionPos.size() > 0) {
 			outState.putIntegerArrayList("mListSectionPos", mListSectionPos);

@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.tiger.mobile.amap.R;
 import com.tiger.mobile.amap.activity.QueryCityActivity;
+import com.tiger.mobile.amap.entity.City;
 import com.tiger.mobile.amap.view.PinnedHeaderListView;
 
 // Customized adaptor to populate data in PinnedHeaderListView
@@ -34,13 +35,17 @@ public class PinnedHeaderAdapter extends BaseAdapter implements OnScrollListener
 
 	// array list to store list view data
 	ArrayList<String> mListItems;
+	
+	ArrayList<String> mListShowItems;
 
 	// context object
 	Context mContext;
 
-	public PinnedHeaderAdapter(Context context, ArrayList<String> listItems,ArrayList<Integer> listSectionPos) {
+	public PinnedHeaderAdapter(Context context, ArrayList<String> listItems,ArrayList<String> listShowItems,
+			ArrayList<Integer> listSectionPos) {
 		this.mContext = context;
 		this.mListItems = listItems;
+		this.mListShowItems = listShowItems;
 		this.mListSectionPos = listSectionPos;
 
 		mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -103,7 +108,7 @@ public class PinnedHeaderAdapter extends BaseAdapter implements OnScrollListener
 			holder = (ViewHolder) convertView.getTag();
 		}
 
-		holder.textView.setText(mListItems.get(position).toString());
+		holder.textView.setText(mListShowItems.get(position).toString());
 		return convertView;
 	}
 

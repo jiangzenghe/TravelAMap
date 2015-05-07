@@ -1,14 +1,19 @@
 package com.tiger.mobile.amap.activity;
 
+import java.util.ArrayList;
+
 import android.app.ActionBar;
 import android.app.Activity;
 import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.GridView;
 import android.widget.LinearLayout;
@@ -21,7 +26,6 @@ import com.amap.api.location.LocationProviderProxy;
 import com.amap.api.maps2d.AMap;
 import com.amap.api.maps2d.AMap.OnCameraChangeListener;
 import com.amap.api.maps2d.AMap.OnMapLoadedListener;
-import com.amap.api.maps2d.AMapOptions;
 import com.amap.api.maps2d.CameraUpdateFactory;
 import com.amap.api.maps2d.LocationSource;
 import com.amap.api.maps2d.MapView;
@@ -34,6 +38,8 @@ import com.amap.api.maps2d.model.TileOverlayOptions;
 import com.amap.api.maps2d.model.VisibleRegion;
 import com.tiger.mobile.amap.R;
 import com.tiger.mobile.amap.util.MyUrlTileProvider;
+import com.tiger.mobile.amap.util.Utils;
+import com.tiger.mobile.amap.view.ColumnHorizontalScrollView;
 
 /**
  * AMapV1地图demo总汇
@@ -44,10 +50,20 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 	private AMap mMap;
 	private MapView mapView;
 	private TextView cilckText;
+	private TextView routeText;
 	private GridView layoutShow;
 	private OnLocationChangedListener mListener;
 	private LocationManagerProxy mAMapLocationManager;
 	private TileOverlay tileOverlay;
+	private ColumnHorizontalScrollView mColumnHorizontalScrollView;
+	private LinearLayout mRoute_layout;
+	
+	/** 分类列表*/
+	private ArrayList<String> routeList=new ArrayList<String>();
+	/** 屏幕宽度 */
+	private int mScreenWidth = 0;
+	/** Item宽度 */
+	private int mItemWidth = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +76,38 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 		mapView = (MapView) findViewById(R.id.map);
 		mapView.onCreate(savedInstanceState);// 此方法必须重写
 		
+		mScreenWidth = Utils.getWindowsWidth(this);
+		mItemWidth = mScreenWidth / 4;
+		routeList = new ArrayList<String>();
+		routeList.add("点1");
+		routeList.add("点2");
+		routeList.add("点3");
+		routeList.add("点4");
+		
+		mRoute_layout = (LinearLayout) findViewById(R.id.layout_route);
+		mColumnHorizontalScrollView = (ColumnHorizontalScrollView) findViewById(R.id.mColumnHorizontalScrollView);
 		cilckText = (TextView) findViewById(R.id.help);
 		layoutShow = (GridView) findViewById(R.id.layout_show);
+		routeText = (TextView) findViewById(R.id.route);
+		routeText.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if(mColumnHorizontalScrollView.getVisibility() == View.VISIBLE) {
+//					Animation mHideAction = AnimationUtils.loadAnimation(MapActivity.this, R.anim.right_out);
+					TranslateAnimation mHideAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, -1.0f,     
+							Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,     
+							0.0f, Animation.RELATIVE_TO_SELF, 0.0f);  
+					mColumnHorizontalScrollView.setAnimation(mHideAction);
+					mColumnHorizontalScrollView.setVisibility(View.GONE);
+				} else {
+					Animation mShowAction = AnimationUtils.loadAnimation(MapActivity.this, R.anim.right_in);
+					mColumnHorizontalScrollView.setAnimation(mShowAction);
+					mColumnHorizontalScrollView.setVisibility(View.VISIBLE);
+				}
+			}
+		});
 //		layoutShow.setVisibility(View.VISIBLE);
 		cilckText.setOnClickListener(new View.OnClickListener() {
 			
@@ -86,11 +132,31 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 			}
 		});
 		
+		initColumn();
 	}
 
+	/** 
+	 *  初始化Column栏目项
+	 * */
+	private void initColumn() {
+		mRoute_layout.removeAllViews();
+		int count =  routeList.size();
+//		mColumnHorizontalScrollView.setParam(this, mScreenWidth, mRoute_layout, shade_left, shade_right, rl_column);
+		for(int i = 0; i< count; i++){
+			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mItemWidth , LayoutParams.WRAP_CONTENT);
+			params.leftMargin = 5;
+			params.rightMargin = 5;
+			TextView columnTextView = new TextView(this);
+			columnTextView.setGravity(Gravity.CENTER);
+			columnTextView.setPadding(5, 5, 5, 5);
+			columnTextView.setId(i);
+			columnTextView.setText(routeList.get(i));
+			mRoute_layout.addView(columnTextView, i ,params);
+		}
+	}
+	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		float a = 1.0f;
 		
 		return false;
 	}
