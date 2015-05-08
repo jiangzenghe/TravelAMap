@@ -265,6 +265,13 @@ public class Utils {
 		return dm.widthPixels;
 	}
 	
+	/** 获取屏幕的度 */
+	public final static int getWindowsHeight(Activity activity) {
+		DisplayMetrics dm = new DisplayMetrics();
+		activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
+		return dm.heightPixels;
+	}
+	
 	/**
 	 * 字符串非空判断
 	 * @param str

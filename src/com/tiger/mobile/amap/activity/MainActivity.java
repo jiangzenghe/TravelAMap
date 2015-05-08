@@ -19,14 +19,17 @@ import com.amap.api.maps2d.AMap;
 import com.amap.api.maps2d.AMap.OnCameraChangeListener;
 import com.amap.api.maps2d.AMap.OnMapLoadedListener;
 import com.amap.api.maps2d.AMap.OnMarkerClickListener;
+import com.amap.api.maps2d.CameraUpdateFactory;
 import com.amap.api.maps2d.LocationSource;
 import com.amap.api.maps2d.MapView;
 import com.amap.api.maps2d.model.BitmapDescriptorFactory;
 import com.amap.api.maps2d.model.CameraPosition;
+import com.amap.api.maps2d.model.LatLng;
 import com.amap.api.maps2d.model.Marker;
 import com.amap.api.maps2d.model.MyLocationStyle;
 import com.amap.api.maps2d.model.VisibleRegion;
 import com.tiger.mobile.amap.R;
+import com.tiger.mobile.amap.entity.City;
 import com.tiger.mobile.amap.entity.PointsClusterEntity;
 import com.tiger.mobile.amap.entity.ScenicModel;
 import com.tiger.mobile.amap.util.CityScenicUtils;
@@ -72,11 +75,28 @@ public final class MainActivity extends Activity implements OnCameraChangeListen
 	    case R.id.action_query:  
 	       // 查询
 	    	Intent intent2 =new Intent(MainActivity.this,QueryCityActivity.class);
-	    	startActivity(intent2);
+	    	this.startActivityForResult(intent2, 0);
 	        return true;  
 	    default:  
 	        return super.onOptionsItemSelected(item);  
 	    }
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode != RESULT_OK) {
+			return ;
+		}
+		//接受结束的字符串
+		City city = (City)data.getExtras().getParcelable("cityResult");
+		
+		if(city!=null) {
+			LatLng position = city.getCityPosition();
+			if(position != null) {
+				mMap.moveCamera(CameraUpdateFactory.changeLatLng(position));
+			}
+		}
+			
 	}
 	
 	/**

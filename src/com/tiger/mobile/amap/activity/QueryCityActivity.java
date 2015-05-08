@@ -1,13 +1,13 @@
 package com.tiger.mobile.amap.activity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -156,6 +156,9 @@ public class QueryCityActivity extends Activity{
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
+				Intent intent = new Intent();
+				intent.putExtra("cityResult", getCity((String)mListView.getAdapter().getItem(arg2)));
+				setResult(-1, intent);
 				finish();
 			}
 			
@@ -318,6 +321,17 @@ public class QueryCityActivity extends Activity{
 		for(City each: original_items) {
 			if(each.getCityPY().equals(pinyin)) {
 				result = each.getCityName();
+				break;
+			}
+		}
+		return result;
+	}
+	
+	private City getCity(String pinyin) {
+		City result = new City();
+		for(City each: original_items) {
+			if(each.getCityPY().equals(pinyin)) {
+				result = each;
 				break;
 			}
 		}

@@ -5,19 +5,23 @@ import java.util.ArrayList;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -39,6 +43,7 @@ import com.amap.api.maps2d.model.TileOverlay;
 import com.amap.api.maps2d.model.TileOverlayOptions;
 import com.amap.api.maps2d.model.VisibleRegion;
 import com.tiger.mobile.amap.R;
+import com.tiger.mobile.amap.entity.PointModel;
 import com.tiger.mobile.amap.util.MyUrlTileProvider;
 import com.tiger.mobile.amap.util.Utils;
 import com.tiger.mobile.amap.view.ColumnHorizontalScrollView;
@@ -62,13 +67,9 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 	private RelativeLayout rl_column;
 	/** 当前选中的栏目*/
 	private int columnSelectIndex = 0;
-	/** 左阴影部分*/
-	public ImageView shade_left;
-	/** 右阴影部分 */
-	public ImageView shade_right;
 	
 	/** 分类列表*/
-	private ArrayList<String> routeList=new ArrayList<String>();
+	private ArrayList<PointModel> routeList=new ArrayList<PointModel>();
 	/** 屏幕宽度 */
 	private int mScreenWidth = 0;
 	/** Item宽度 */
@@ -87,39 +88,73 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 		
 		mScreenWidth = Utils.getWindowsWidth(this);
 		mItemWidth = mScreenWidth / 4;
-		routeList = new ArrayList<String>();
-		routeList.add("点1");
-		routeList.add("点2");
-		routeList.add("点3");
-		routeList.add("点4");
+		routeList = new ArrayList<PointModel>();
+		routeList.add(new PointModel(new LatLng(25.299542,110.301648),"1","点1"));
+		routeList.add(new PointModel(new LatLng(25.399544,110.401650),"2","点2"));
+		routeList.add(new PointModel(new LatLng(25.499545,110.501651),"3","点3"));
+		routeList.add(new PointModel(new LatLng(25.599546,110.601652),"4","点4"));
 		
 		rl_column = (RelativeLayout) findViewById(R.id.rl_column);
-		shade_left = (ImageView) findViewById(R.id.shade_left);
-		shade_right = (ImageView) findViewById(R.id.shade_right);
 		mRoute_layout = (LinearLayout) findViewById(R.id.layout_route);
 		mColumnHorizontalScrollView = (ColumnHorizontalScrollView) findViewById(R.id.mColumnHorizontalScrollView);
 		cilckText = (TextView) findViewById(R.id.help);
 		layoutShow = (GridView) findViewById(R.id.layout_show);
 		routeText = (TextView) findViewById(R.id.route);
-		routeText.setOnClickListener(new View.OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				if(mColumnHorizontalScrollView.getVisibility() == View.VISIBLE) {
-//					Animation mHideAction = AnimationUtils.loadAnimation(MapActivity.this, R.anim.right_out);
-					TranslateAnimation mHideAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF, -1.0f,     
-							Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,     
-							0.0f, Animation.RELATIVE_TO_SELF, 0.0f);  
-					mColumnHorizontalScrollView.setAnimation(mHideAction);
-					mColumnHorizontalScrollView.setVisibility(View.GONE);
-				} else {
-					Animation mShowAction = AnimationUtils.loadAnimation(MapActivity.this, R.anim.right_in);
-					mColumnHorizontalScrollView.setAnimation(mShowAction);
-					mColumnHorizontalScrollView.setVisibility(View.VISIBLE);
-				}
-			}
-		});
+		LayoutInflater inflater = LayoutInflater.from(this); 
+        // 引入窗口配置文件 
+        final View view = inflater.inflate(R.layout.main_top_right_dialog, null); 
+        // 创建PopupWindow对象 
+        final PopupWindow pop = new PopupWindow(view, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT, false); 
+        // 需要设置一下此参数，点击外边可消失 
+        pop.setBackgroundDrawable(new BitmapDrawable()); 
+        //设置点击窗口外边窗口消失 
+        pop.setOutsideTouchable(true); 
+        // 设置此参数获得焦点，否则无法点击 
+        pop.setFocusable(true); 
+        routeText.setOnClickListener(new OnClickListener() { 
+               
+            @Override 
+            public void onClick(View v) { 
+                if(pop.isShowing()) { 
+                    // 隐藏窗口，如果设置了点击窗口外小时即不需要此方式隐藏 
+                    pop.dismiss(); 
+                } else { 
+                    // 显示窗口 
+                	int[] location = new int[2];  
+                    v.getLocationOnScreen(location);  
+                    int mWindowHeight = Utils.getWindowsHeight(MapActivity.this);
+                    pop.showAtLocation(v, Gravity.LEFT | Gravity.BOTTOM, 0, mWindowHeight-location[1]+pop.getHeight()); 
+                    final LinearLayout classic_route = (LinearLayout)view.findViewById(R.id.classic_route);
+                    final LinearLayout classic_good = (LinearLayout)view.findViewById(R.id.good_route);
+                    
+                    classic_route.setOnClickListener(new OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							if(pop.isShowing()) pop.dismiss();
+							rl_column.setVisibility(View.GONE);
+	                    	Animation mShowAction = AnimationUtils.loadAnimation(MapActivity.this, R.anim.right_in);
+	    					rl_column.setAnimation(mShowAction);
+	    					rl_column.setVisibility(View.VISIBLE);
+						}
+                    	
+                    });
+                    classic_good.setOnClickListener(new OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							if(pop.isShowing()) pop.dismiss();
+							rl_column.setVisibility(View.GONE);
+	                    	Animation mShowAction = AnimationUtils.loadAnimation(MapActivity.this, R.anim.right_in);
+	    					rl_column.setAnimation(mShowAction);
+	    					rl_column.setVisibility(View.VISIBLE);
+						}
+                    	
+                    });
+                } 
+                   
+            } 
+        }); 
 //		layoutShow.setVisibility(View.VISIBLE);
 		cilckText.setOnClickListener(new View.OnClickListener() {
 			
@@ -153,19 +188,40 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 	private void initColumn() {
 		mRoute_layout.removeAllViews();
 		int count =  routeList.size();
-		mColumnHorizontalScrollView.setParam(this, mScreenWidth, mRoute_layout, shade_left, shade_right, rl_column);
+		mColumnHorizontalScrollView.setParam(this, mScreenWidth, mRoute_layout, rl_column);
 		for(int i = 0; i< count; i++){
-			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mItemWidth , LayoutParams.WRAP_CONTENT);
-			params.leftMargin = 5;
-			params.rightMargin = 5;
+			
 			TextView columnTextView = new TextView(this);
 			columnTextView.setGravity(Gravity.CENTER);
 			columnTextView.setPadding(5, 5, 5, 5);
 			columnTextView.setId(i);
-			columnTextView.setText(routeList.get(i));
+			columnTextView.setText(routeList.get(i).getScenicName());
+			Drawable nav_left=getResources().getDrawable(R.drawable.rightarrow);
+			nav_left.setBounds(0, 0, nav_left.getMinimumWidth(), nav_left.getMinimumHeight()); 
+			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mItemWidth , LayoutParams.WRAP_CONTENT);
+			if(i!=0) {
+				params.leftMargin = 5;
+				params.rightMargin = 5;
+				columnTextView.setCompoundDrawables(nav_left, null, null, null);
+			} 
+			else {
+				params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+							LayoutParams.WRAP_CONTENT);
+				params.leftMargin = 5;
+				params.rightMargin = 5;
+			}
 			if(columnSelectIndex == i){
 				columnTextView.setSelected(true);
 			}
+			columnTextView.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					columnSelectIndex = v.getId();
+					mMap.moveCamera(CameraUpdateFactory.changeLatLng(routeList.get(columnSelectIndex).getLatLng()));
+				}
+				
+			});
 			mRoute_layout.addView(columnTextView, i ,params);
 		}
 	}
@@ -279,6 +335,7 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
         }
 		tileOverlay = mMap.addTileOverlay((new TileOverlayOptions())
         		.tileProvider(new MyUrlTileProvider(256, 256))
+        		.diskCacheEnabled(true).diskCacheSize(100)
         		.zIndex(-10));
 		tileOverlay.setVisible(true);
 		

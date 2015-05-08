@@ -1,6 +1,9 @@
 package com.tiger.mobile.amap.entity;
 
-import java.util.Comparator;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.amap.api.maps2d.model.LatLng;
 
 
 /**
@@ -13,8 +16,11 @@ import java.util.Comparator;
  *<p>         创建  </p>
  *
  */
-public class City {
+public class City implements Parcelable{
 
+	public City() {
+	}
+	
 	public City(String name,String py) {
 		this.cityName = name;
 		this.cityPY =py;
@@ -23,6 +29,7 @@ public class City {
 	private String cityCode;
 	private String cityName;
 	private String cityPY;
+	private LatLng cityPosition;
 	public String getCityCode() {
 		return cityCode;
 	}
@@ -41,6 +48,46 @@ public class City {
 	public void setCityPY(String cityPY) {
 		this.cityPY = cityPY;
 	}
+	public LatLng getCityPosition() {
+		return cityPosition;
+	}
+	public void setCityPosition(LatLng cityPosition) {
+		this.cityPosition = cityPosition;
+	}
+
+	public static final Parcelable.Creator<City> CREATOR  
+	    = new Parcelable.Creator<City>() {  
+		public City createFromParcel(Parcel in) {  
+		    return new City(in);  
+		}  
+		
+		public City[] newArray(int size) {  
+		    return new City[size];  
+		}  
+	}; 
+	
+	@Override
+	public int describeContents() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		// TODO Auto-generated method stub
+		dest.writeString(cityCode);  
+		dest.writeString(cityName); 
+		dest.writeString(cityPY); 
+		dest.writeParcelable(cityPosition, flags); 
+	}
+	
+	//inyuout sequence
+	private City(Parcel in) {  
+		cityCode = in.readString();  
+		cityName = in.readString();  
+		cityPY = in.readString();
+		cityPosition = in.readParcelable(LatLng.class.getClassLoader());
+    } 
 	
 //	public int compare(City s1, City s2) {
 //		return s1.getShortPName().compareToIgnoreCase(s2.getPName());
