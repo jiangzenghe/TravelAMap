@@ -19,7 +19,6 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
-import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -43,10 +42,12 @@ import com.amap.api.maps2d.model.TileOverlay;
 import com.amap.api.maps2d.model.TileOverlayOptions;
 import com.amap.api.maps2d.model.VisibleRegion;
 import com.tiger.mobile.amap.R;
+import com.tiger.mobile.amap.adapter.TestAdapter;
 import com.tiger.mobile.amap.entity.PointModel;
 import com.tiger.mobile.amap.util.MyUrlTileProvider;
 import com.tiger.mobile.amap.util.Utils;
 import com.tiger.mobile.amap.view.ColumnHorizontalScrollView;
+import com.tiger.mobile.amap.view.GridView;
 
 /**
  * AMapV1地图demo总汇
@@ -180,6 +181,7 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 		});
 		
 		initColumn();
+		initGridView();
 	}
 
 	/** 
@@ -195,9 +197,32 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 			columnTextView.setGravity(Gravity.CENTER);
 			columnTextView.setPadding(5, 5, 5, 5);
 			columnTextView.setId(i);
-			columnTextView.setText(routeList.get(i).getScenicName());
+			TextView columnTitleTextView = new TextView(this);
+			columnTitleTextView.setGravity(Gravity.CENTER);
+			columnTitleTextView.setPadding(5, 5, 5, 5);
+			columnTitleTextView.setText(routeList.get(i).getScenicName());
+			columnTextView.setText(i+1+"");
 			Drawable nav_left=getResources().getDrawable(R.drawable.rightarrow);
 			nav_left.setBounds(0, 0, nav_left.getMinimumWidth(), nav_left.getMinimumHeight()); 
+			
+			LinearLayout columnLayout = new LinearLayout(this);
+			columnLayout.setOrientation(LinearLayout.VERTICAL);
+			columnLayout.addView(columnTextView);
+			columnLayout.addView(columnTitleTextView);
+			columnLayout.setId(i);
+			columnLayout.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					columnSelectIndex = v.getId();
+					mMap.moveCamera(CameraUpdateFactory.changeLatLng(routeList.get(columnSelectIndex).getLatLng()));
+				}
+				
+			});
+			if(columnSelectIndex == i){
+				columnTextView.setSelected(true);
+			}
+			
 			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mItemWidth , LayoutParams.WRAP_CONTENT);
 			if(i!=0) {
 				params.leftMargin = 5;
@@ -210,20 +235,48 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 				params.leftMargin = 5;
 				params.rightMargin = 5;
 			}
-			if(columnSelectIndex == i){
-				columnTextView.setSelected(true);
-			}
-			columnTextView.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					columnSelectIndex = v.getId();
-					mMap.moveCamera(CameraUpdateFactory.changeLatLng(routeList.get(columnSelectIndex).getLatLng()));
-				}
-				
-			});
-			mRoute_layout.addView(columnTextView, i ,params);
+			mRoute_layout.addView(columnLayout, i ,params);
 		}
+	}
+	
+	private void initGridView() {
+		ArrayList<String> titles = new ArrayList<String>();
+		ArrayList<Drawable> images = new ArrayList<Drawable>();
+		
+		Drawable object0 = 
+				this.getResources().getDrawable(R.drawable.image01);
+		images.add(object0);
+		titles.add("厕所");
+		Drawable object1 = 
+				this.getResources().getDrawable(R.drawable.image02);
+		images.add(object1);
+		titles.add("入口");
+		Drawable object2 = 
+				this.getResources().getDrawable(R.drawable.image03);
+		images.add(object2);
+		titles.add("商店");
+		Drawable object3 = 
+				this.getResources().getDrawable(R.drawable.image04);
+		images.add(object3);
+		titles.add("美食");
+		Drawable object4 = 
+				this.getResources().getDrawable(R.drawable.image05);
+		images.add(object4);
+		titles.add("用车");
+		Drawable object5 = 
+				this.getResources().getDrawable(R.drawable.image06);
+		images.add(object5);
+		titles.add("景点");
+		Drawable object6 = 
+				this.getResources().getDrawable(R.drawable.image07);
+		images.add(object6);
+		titles.add("好玩");
+		Drawable object7 = 
+				this.getResources().getDrawable(R.drawable.image08);
+		images.add(object7);
+		titles.add("更多");
+		TestAdapter adapter = new TestAdapter(MapActivity.this, titles, images);
+		layoutShow.setAdapter(adapter);
 	}
 	
 	@Override

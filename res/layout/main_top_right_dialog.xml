@@ -18,7 +18,7 @@
  			    android:layout_width="wrap_content"
  			    android:layout_height="wrap_content"
  			    android:padding="8dp"
- 			    android:text="发起聊天"
+ 			    android:text="经典路线"
  			    android:textColor="#fff"
  			    android:textSize="18sp" />    		    
  		</LinearLayout>
@@ -32,7 +32,7 @@
  			    android:layout_width="wrap_content"
  			    android:layout_height="wrap_content"
  			    android:padding="8dp"
- 			    android:text="听筒模式"
+ 			    android:text="畅游路线"
  			    android:textColor="#fff"
  			    android:textSize="18sp" />    		    
  		</LinearLayout>

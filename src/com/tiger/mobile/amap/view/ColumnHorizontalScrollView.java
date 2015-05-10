@@ -23,6 +23,8 @@ public class ColumnHorizontalScrollView extends HorizontalScrollView {
 	private View ll_content;
 	/** 传入拖动栏布局 */
 	private View rl_column;
+	
+	private View ll_titel;
 	/** 屏幕宽度 */
 	private int mScreenWitdh = 0;
 	/** 父类的活动activity */

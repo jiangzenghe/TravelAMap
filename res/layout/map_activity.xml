@@ -21,20 +21,20 @@
 	    <RelativeLayout
             android:id="@+id/rl_column"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1.0"
             android:visibility="gone" >
             
 		    <com.tiger.mobile.amap.view.ColumnHorizontalScrollView
 	            android:id="@+id/mColumnHorizontalScrollView"
 	            android:layout_width="match_parent"
-	            android:layout_height="50dp"
+	            android:layout_height="wrap_content"
 	            android:scrollbars="none" >
 	
 	            <LinearLayout
 	                android:id="@+id/layout_route"
 	                android:layout_width="fill_parent"
-	                android:layout_height="50dp"
+	                android:layout_height="wrap_content"
 	                android:layout_centerVertical="true"
 	                android:gravity="center_vertical"
 	                android:orientation="horizontal"
@@ -53,7 +53,7 @@
 		        android:layout_width="0dp"
 		 		android:layout_height="match_parent"
 		 		android:layout_weight="1"
-		 		android:drawableRight="@drawable/downarrow"
+		 		android:drawableLeft="@drawable/uparrow"
 		 		android:text="线路规划"/>
 		    <TextView 
 		        android:id="@+id/help"
@@ -65,12 +65,12 @@
 		 		android:layout_weight="1"
 		 		android:text="助手"/>
 		</LinearLayout> 
-		<GridView 
+		<com.tiger.mobile.amap.view.GridView 
 		    android:id="@+id/layout_show"
 		    android:layout_width="fill_parent"
-		 android:layout_height="60dp"
-		 android:visibility="gone">
-		</GridView> 
+		    android:numColumns="4"
+		 	android:layout_height="100dp"
+		 	android:visibility="gone"/>
 	</LinearLayout>
    
 	    

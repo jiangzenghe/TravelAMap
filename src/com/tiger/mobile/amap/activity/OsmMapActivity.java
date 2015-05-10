@@ -40,7 +40,7 @@ public class OsmMapActivity extends Activity {
 		// 相关限制：1、需要在地图初始化之前调用该方法
 		// 2、设置该方法会导致中英文地图切换失效
 		// 3、提供地址默认替换顺序为 zoom、x、y
-		MapsInitializer.replaceURL(OSM_URL, "AAA"); // 地图初始化之前设置,将底图资源进行替换
+		MapsInitializer.replaceURL(OSM_URL, "OSM"); // 地图初始化之前设置,将底图资源进行替换
 		mapView = (MapView) findViewById(R.id.map);
 		mapView.onCreate(savedInstanceState);// 此方法必须重写
 
