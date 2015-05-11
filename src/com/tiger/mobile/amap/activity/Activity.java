@@ -1,11 +1,6 @@
 package com.tiger.mobile.amap.activity;
-import java.util.ArrayList;
-import java.util.List;
 
-import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-
-import com.tiger.mobile.amap.util.Utils;
 
 
 /**

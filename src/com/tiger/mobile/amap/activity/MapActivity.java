@@ -3,6 +3,7 @@ package com.tiger.mobile.amap.activity;
 import java.util.ArrayList;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -32,6 +33,7 @@ import com.amap.api.maps2d.AMap.OnCameraChangeListener;
 import com.amap.api.maps2d.AMap.OnMapLoadedListener;
 import com.amap.api.maps2d.CameraUpdateFactory;
 import com.amap.api.maps2d.LocationSource;
+import com.amap.api.maps2d.LocationSource.OnLocationChangedListener;
 import com.amap.api.maps2d.MapView;
 import com.amap.api.maps2d.model.BitmapDescriptorFactory;
 import com.amap.api.maps2d.model.CameraPosition;
@@ -47,7 +49,6 @@ import com.tiger.mobile.amap.util.MyUrlTileProvider;
 import com.tiger.mobile.amap.util.Utils;
 import com.tiger.mobile.amap.view.ColumnHorizontalScrollView;
 import com.tiger.mobile.amap.view.GridView;
-
 /**
  * AMapV1地图demo总汇
  */
@@ -83,6 +84,7 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 		actionBar.setDisplayHomeAsUpEnabled(true);//显示返回箭头
         actionBar.setDisplayShowHomeEnabled(false);
         actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle("             崂山风景区");
 		mapView = (MapView) findViewById(R.id.map);
 		mapView.onCreate(savedInstanceState);// 此方法必须重写
 		

@@ -28,6 +28,8 @@ import com.tiger.mobile.amap.view.IndexBarView;
 import com.tiger.mobile.amap.view.PinnedHeaderListView;
 import com.tiger.mobile.amap.view.filterlistviewhelp.PinnedHeaderAdapter;
 
+import android.app.Activity;
+
 /**
  * 搜索功能
  *
@@ -110,7 +112,7 @@ public class QueryCityActivity extends Activity{
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);// 显示返回箭头
 		actionBar.setDisplayShowHomeEnabled(false);	
-		actionBar.setTitle("选择城市");
+		actionBar.setTitle("             选择城市");
 		// UI elements
 		setupViews();
 

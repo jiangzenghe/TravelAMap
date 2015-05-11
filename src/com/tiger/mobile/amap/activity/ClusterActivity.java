@@ -3,6 +3,7 @@ package com.tiger.mobile.amap.activity;
 import java.util.ArrayList;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
@@ -57,14 +58,14 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 		actionBar.setDisplayHomeAsUpEnabled(false);//显示返回箭头
         actionBar.setDisplayShowHomeEnabled(false); 
         actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle("烟台");
+        actionBar.setTitle("             烟台");
 		mapView = (MapView) findViewById(R.id.map);
 		mapView.onCreate(savedInstanceState);// 此方法必须重写
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.main_cluster, menu);
         return true;
     }
 	

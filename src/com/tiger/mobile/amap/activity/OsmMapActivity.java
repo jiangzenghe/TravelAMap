@@ -10,15 +10,11 @@ import com.amap.api.maps2d.AMap;
 import com.amap.api.maps2d.CameraUpdateFactory;
 import com.amap.api.maps2d.MapView;
 import com.amap.api.maps2d.MapsInitializer;
-import com.amap.api.maps2d.model.BitmapDescriptorFactory;
-import com.amap.api.maps2d.model.GroundOverlayOptions;
 import com.amap.api.maps2d.model.LatLng;
 import com.amap.api.maps2d.model.LatLngBounds;
 import com.amap.api.maps2d.model.PolylineOptions;
 import com.amap.api.maps2d.model.TileOverlay;
-import com.amap.api.maps2d.model.TileOverlayOptions;
 import com.tiger.mobile.amap.R;
-import com.tiger.mobile.amap.util.MyUrlTileProvider;
 
 /*
  * 替换底图资源显示，这里用于显示openstreetmap的底图

@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.view.Gravity;
@@ -21,6 +22,8 @@ import com.tiger.mobile.amap.fragment.ScenicAreaFragment;
 import com.tiger.mobile.amap.fragment.ScenicAreaSmallFragment;
 import com.tiger.mobile.amap.util.AndroidUtils;
 import com.tiger.mobile.amap.util.LogUtil;
+
+//import android.app.Activity;
 
 public class MainActivity extends Activity implements AMapLocationListener {
     private DrawerLayout mDrawerLayout;
@@ -92,9 +95,10 @@ public class MainActivity extends Activity implements AMapLocationListener {
     }
 
     private void replaceFragment(int container, Fragment fragment) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(container, fragment);
-        transaction.commit();
+//        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+//    	FragmentTransaction transaction = getFragmentManager().beginTransaction();
+//        transaction.replace(container, fragment);
+//        transaction.commit();
     }
 
     @Override
