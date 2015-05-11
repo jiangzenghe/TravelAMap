@@ -1,5 +1,10 @@
 package com.tiger.mobile.amap.fragment;
 
+import java.util.ArrayList;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,18 +18,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.imyuu.travel.R;
-import com.imyuu.travel.api.ApiClient;
-import com.imyuu.travel.model.Recommend;
-import com.imyuu.travel.model.ScenicIntroductionJson;
-import com.imyuu.travel.utils.LogUtil;
-import com.imyuu.travel.view.JustifyTextView;
-
-import java.util.ArrayList;
-
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import com.tiger.mobile.amap.ApiClient;
+import com.tiger.mobile.amap.R;
+import com.tiger.mobile.amap.entity.Recommend;
+import com.tiger.mobile.amap.entity.ScenicIntroductionJson;
+import com.tiger.mobile.amap.util.LogUtil;
 
 /**
  * Created by administor on 2015/5/3.
@@ -58,7 +56,7 @@ public class ScenicSummaryFragment extends Fragment {
         String url=intent.getStringExtra("URL");
         String scenicId=intent.getStringExtra("scenicId");
         scenicName.setText(intent.getStringExtra("scenicName"));
-        imageList = new ArrayList<>();
+        imageList = new ArrayList<Recommend>();
         adaptor = new ScenicSummaryAdaptor();
         recyclerView = (RecyclerView) view.findViewById(R.id.recycler_summary_scenic);
         GridLayoutManager layoutManager = new GridLayoutManager(getActivity(),2);

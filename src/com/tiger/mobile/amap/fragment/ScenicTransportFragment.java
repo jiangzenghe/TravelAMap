@@ -1,11 +1,14 @@
 package com.tiger.mobile.amap.fragment;
 
+import java.util.ArrayList;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,18 +16,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.imyuu.travel.R;
-import com.imyuu.travel.api.ApiClient;
-import com.imyuu.travel.model.Recommend;
-import com.imyuu.travel.model.ScenicIntroductionJson;
-import com.imyuu.travel.model.ScenicTransportJson;
-import com.imyuu.travel.utils.LogUtil;
-
-import java.util.ArrayList;
-
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import com.tiger.mobile.amap.ApiClient;
+import com.tiger.mobile.amap.R;
+import com.tiger.mobile.amap.entity.Recommend;
+import com.tiger.mobile.amap.entity.ScenicTransportJson;
 
 /**
  * ScenicTransportFragment 景点交通简介

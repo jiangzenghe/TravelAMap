@@ -1,35 +1,32 @@
 package com.tiger.mobile.amap.fragment;
 
+import java.util.ArrayList;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.facebook.drawee.view.SimpleDraweeView;
-import com.imyuu.travel.R;
-import com.imyuu.travel.api.ApiClient;
-import com.imyuu.travel.callback.LoadFinishCallBack;
-import com.imyuu.travel.model.ScenicArea;
-import com.imyuu.travel.model.ScenicAreaJson;
-import com.imyuu.travel.view.AutoLoadRecyclerView;
-
-import java.util.ArrayList;
-
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.tiger.mobile.amap.ApiClient;
+import com.tiger.mobile.amap.R;
+import com.tiger.mobile.amap.callback.LoadFinishCallBack;
+import com.tiger.mobile.amap.entity.ScenicAreaJson;
+import com.tiger.mobile.amap.view.AutoLoadRecyclerView;
 
 /**
  * Created by tule on 2015/4/27.
@@ -69,7 +66,7 @@ public class ScenicAreaSmallFragment extends Fragment {
         mRecyclerView.setHasFixedSize(false);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mLoadFinisCallBack = mRecyclerView;
-        mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),2));
+        mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(),2));//GridLayoutManager
         mRecyclerView.setLoadMoreListener(new AutoLoadRecyclerView.onLoadMoreListener() {
             @Override
             public void loadMore() {
@@ -135,7 +132,7 @@ public class ScenicAreaSmallFragment extends Fragment {
     private class ScenicFragmentAdapter extends RecyclerView.Adapter<ViewHolder> {
 
         public ScenicFragmentAdapter(){
-            data = new ArrayList<>();
+            data = new ArrayList<ScenicAreaJson>();
         }
 
         private int page=-1;

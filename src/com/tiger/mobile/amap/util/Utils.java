@@ -26,11 +26,17 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.app.ProgressDialog;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 
 import com.tiger.mobile.amap.R;
 
@@ -49,6 +55,21 @@ public class Utils {
 	public static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	public static NumberFormat currencyFormat = NumberFormat.getCurrencyInstance();
 	private static long lastClickTime; //用于记录控件的点击时间
+	
+	public static Bundle getActivityMetaDataBundle(
+			PackageManager packageManager, ComponentName component) {
+		Bundle bundle = null;
+		try {
+			ActivityInfo ai = packageManager.getActivityInfo(component,
+					PackageManager.GET_META_DATA);
+			bundle = ai.metaData;
+		} catch (NameNotFoundException e) {
+			Log.e("getMetaDataBundle", e.getMessage(), e);
+		}
+
+		return bundle;
+	}
+	
 	/**
 	 * 将一个日期类型格式化为一个年-月-日 小时:分钟 如 2014-09-12 17:24
 	 * @param date

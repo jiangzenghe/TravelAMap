@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="GenericDraweeView">
+    	<attr format="integer" name="fadeDuration"/>
+    	<attr format="float" name="viewAspectRatio"/>
+    	<attr format="reference" name="placeholderImage"/>
+    	<attr format="string" name="placeholderImageScaleType"/>
+    	<attr format="reference" name="retryImage"/>
+    	<attr format="string" name="retryImageScaleType"/>
+    	<attr format="reference" name="failureImage"/>
+    	<attr format="string" name="failureImageScaleType"/>
+    	<attr format="reference" name="progressBarImage"/>
+    	<attr format="string" name="progressBarImageScaleType"/>
+    	<attr format="integer" name="progressBarAutoRotateInterval"/>
+    	<attr format="string" name="actualImageScaleType"/>
+    	<attr format="reference" name="backgroundImage"/>
+    	<attr format="reference" name="overlayImage"/>
+    	<attr format="reference" name="pressedStateOverlayImage"/>
+    	<attr format="boolean" name="roundAsCircle"/>
+    	<attr format="dimension" name="roundedCornerRadius"/>
+    	<attr format="boolean" name="roundTopLeft"/>
+    	<attr format="boolean" name="roundTopRight"/>
+    	<attr format="boolean" name="roundBottomRight"/>
+    	<attr format="boolean" name="roundBottomLeft"/>
+    	<attr format="color" name="roundWithOverlayColor"/>
+    	<attr format="dimension" name="roundingBorderWidth"/>
+    	<attr format="color" name="roundingBorderColor"/>
+    </declare-styleable>
+    
+    <declare-styleable name="CardView">
+        <!-- Background color for CardView. -->
+        <attr name="cardBackgroundColor" format="color" />
+        <!-- Corner radius for CardView. -->
+        <attr name="cardCornerRadius" format="dimension" />
+        <!-- Elevation for CardView. -->
+        <attr name="cardElevation" format="dimension" />
+        <!-- Maximum Elevation for CardView. -->
+        <attr name="cardMaxElevation" format="dimension" />
+        <!-- Add padding in API v21+ as well to have the same measurements with previous versions. -->
+        <attr name="cardUseCompatPadding" format="boolean" />
+        <!-- Add padding to CardView on v20 and before to prevent intersections between the Card content and rounded corners. -->
+        <attr name="cardPreventCornerOverlap" format="boolean" />
+        <!-- Inner padding between the edges of the Card and children of the CardView. -->
+        <attr name="contentPadding" format="dimension" />
+        <!-- Inner padding between the left edge of the Card and children of the CardView. -->
+        <attr name="contentPaddingLeft" format="dimension" />
+        <!-- Inner padding between the right edge of the Card and children of the CardView. -->
+        <attr name="contentPaddingRight" format="dimension" />
+        <!-- Inner padding between the top edge of the Card and children of the CardView. -->
+        <attr name="contentPaddingTop" format="dimension" />
+        <!-- Inner padding between the bottom edge of the Card and children of the CardView. -->
+        <attr name="contentPaddingBottom" format="dimension" />
+    </declare-styleable>
+    
+    <declare-styleable name="PagerSlidingTabStrip">
+        <attr name="pstsIndicatorColor" format="color" />
+        <attr name="pstsUnderlineColor" format="color" />
+        <attr name="pstsDividerColor" format="color" />
+        <attr name="pstsIndicatorHeight" format="dimension" />
+        <attr name="pstsUnderlineHeight" format="dimension" />
+        <attr name="pstsDividerPadding" format="dimension" />
+        <attr name="pstsTabPaddingLeftRight" format="dimension" />
+        <attr name="pstsScrollOffset" format="dimension" />
+        <attr name="pstsTabBackground" format="reference" />
+        <attr name="pstsShouldExpand" format="boolean" />
+        <attr name="pstsTextAllCaps" format="boolean" />
+    </declare-styleable>
+    
+</resources>

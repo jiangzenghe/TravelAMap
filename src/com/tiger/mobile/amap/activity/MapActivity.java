@@ -3,7 +3,6 @@ package com.tiger.mobile.amap.activity;
 import java.util.ArrayList;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
