@@ -10,6 +10,28 @@
 	    android:id="@+id/map"
 	    android:layout_width="fill_parent"
 	    android:layout_height="fill_parent" />
+	   
+	   <LinearLayout 
+	       android:layout_marginTop="10dp"
+	       android:layout_marginLeft="10dp"
+	       android:id="@+id/layout_redalert"
+		    android:layout_width="wrap_content"
+		    android:layout_height="40dp"
+		    android:orientation="horizontal"
+		    android:background="@color/color_white"
+		    android:layout_gravity="top|left"
+		    android:padding="5dp">
+		    <ImageView 
+		       android:layout_width="30dp"
+		       android:layout_height="30dp"
+		       android:src="@drawable/ic_detail_waring"/>
+		    <TextView 
+		        android:id="@+id/text_redalert"
+		        android:layout_width="wrap_content"
+		       android:layout_height="30dp"
+		       android:text="红色警报,2500/1500人"
+		       android:visibility="gone"/>
+		</LinearLayout>
 	<LinearLayout 
 	    android:layout_width="fill_parent"
 	    android:layout_height="wrap_content"
@@ -23,6 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
+            android:padding="5dp"
             android:visibility="gone" >
             
 		    <com.tiger.mobile.amap.view.ColumnHorizontalScrollView
@@ -42,6 +65,12 @@
 	                android:paddingRight="10dp" />
 	        </com.tiger.mobile.amap.view.ColumnHorizontalScrollView>
         </RelativeLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+			android:layout_height="1dp"
+			android:background="@drawable/divider"
+			android:orientation="horizontal">
+		</LinearLayout>
 		<LinearLayout 
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
@@ -65,6 +94,12 @@
 		 		android:layout_weight="1"
 		 		android:text="助手"/>
 		</LinearLayout> 
+		<LinearLayout
+            android:layout_width="fill_parent"
+			android:layout_height="1dp"
+			android:background="@drawable/divider"
+			android:orientation="horizontal">
+		</LinearLayout>
 		<com.tiger.mobile.amap.view.GridView 
 		    android:id="@+id/layout_show"
 		    android:layout_width="fill_parent"

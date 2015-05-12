@@ -15,12 +15,12 @@ import retrofit.http.Path;
 import retrofit.http.Query;
 import retrofit.mime.TypedFile;
 
-import com.tiger.mobile.amap.entity.ScenicAreaJson;
-import com.tiger.mobile.amap.entity.ScenicDetailJson;
-import com.tiger.mobile.amap.entity.ScenicIntroductionJson;
-import com.tiger.mobile.amap.entity.ScenicTransportJson;
 import com.tiger.mobile.amap.remote.model.RecommendLine;
+import com.tiger.mobile.amap.remote.model.ScenicAreaJson;
+import com.tiger.mobile.amap.remote.model.ScenicDetailJson;
+import com.tiger.mobile.amap.remote.model.ScenicIntroductionJson;
 import com.tiger.mobile.amap.remote.model.ScenicPointJson;
+import com.tiger.mobile.amap.remote.model.ScenicTransportJson;
 
 
 public class ApiClient {

@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.os.Handler;
+import android.text.TextPaint;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -111,13 +115,26 @@ public class ClusterUtils {
 			MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f)
 					.position(new LatLng(each.getLat(), each.getLng()));
 			arg0.title(each.getText());
+//			if(each.getClusterCount() > 1) {
+//				if(each.getClusterCount() == 2) {
+//					arg0.icon(BitmapDescriptorFactory.fromBitmap(getBitMap("2", R.drawable.h_middle)));
+//				} else if(each.getClusterCount() == 3) {
+//					arg0.icon(BitmapDescriptorFactory.fromBitmap(getBitMap("3", R.drawable.h_high)));
+//				} else {
+//					arg0.icon(BitmapDescriptorFactory.fromBitmap(getBitMap(each.getClusterCount()+"",
+//							R.drawable.h_highest)));
+//				}
+//			} else {
+//				arg0.icon(BitmapDescriptorFactory.fromBitmap(getBitMap("1", R.drawable.h_low)));
+//			}
 			if(each.getClusterCount() > 1) {
 				if(each.getClusterCount() == 2) {
 					arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.h_middle));
 				} else if(each.getClusterCount() == 3) {
 					arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.h_high));
 				} else {
-					arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.h_highest));
+					arg0.icon(BitmapDescriptorFactory.fromResource(
+							R.drawable.h_highest));
 				}
 			} else {
 				arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.h_low));
@@ -129,5 +146,17 @@ public class ClusterUtils {
 		//test the time to draw
 		Log.e("draw end", new Date().getTime() + "");
 	}
+	
+	 public Bitmap getBitMap(String text, int sourceId) {                
+		 	Bitmap bitmap = BitmapDescriptorFactory.fromResource(sourceId).getBitmap();
+			bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
+			             bitmap.getHeight());
+//			Canvas canvas = new Canvas(bitmap);
+//			TextPaint textPaint = new TextPaint();
+//			textPaint.setTextSize(20f);
+//			textPaint.setColor(Color.RED);
+//			canvas.drawText(text, 18, 30, textPaint);// 设置bitmap上面的文字位置
+			return bitmap;
+			}
 	
 }
