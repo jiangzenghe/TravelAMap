@@ -10,24 +10,26 @@ import android.location.Location;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationListener;
 import com.amap.api.location.LocationManagerProxy;
 import com.amap.api.location.LocationProviderProxy;
-import com.amap.api.maps2d.AMap;
-import com.amap.api.maps2d.AMap.OnCameraChangeListener;
-import com.amap.api.maps2d.AMap.OnMapLoadedListener;
-import com.amap.api.maps2d.AMap.OnMarkerClickListener;
-import com.amap.api.maps2d.CameraUpdateFactory;
-import com.amap.api.maps2d.LocationSource;
-import com.amap.api.maps2d.MapView;
-import com.amap.api.maps2d.model.BitmapDescriptorFactory;
-import com.amap.api.maps2d.model.CameraPosition;
-import com.amap.api.maps2d.model.LatLng;
-import com.amap.api.maps2d.model.Marker;
-import com.amap.api.maps2d.model.MyLocationStyle;
-import com.amap.api.maps2d.model.VisibleRegion;
+import com.amap.api.maps.AMap;
+import com.amap.api.maps.AMap.InfoWindowAdapter;
+import com.amap.api.maps.AMap.OnCameraChangeListener;
+import com.amap.api.maps.AMap.OnMapLoadedListener;
+import com.amap.api.maps.AMap.OnMarkerClickListener;
+import com.amap.api.maps.CameraUpdateFactory;
+import com.amap.api.maps.LocationSource;
+import com.amap.api.maps.LocationSource.OnLocationChangedListener;
+import com.amap.api.maps.MapView;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
+import com.amap.api.maps.model.CameraPosition;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.Marker;
+import com.amap.api.maps.model.MyLocationStyle;
 import com.tiger.mobile.amap.R;
 import com.tiger.mobile.amap.entity.City;
 import com.tiger.mobile.amap.entity.PointsClusterEntity;
@@ -39,7 +41,7 @@ import com.tiger.mobile.amap.util.ClusterUtils;
  * AMapV1地图demo总汇
  */
 public final class ClusterActivity extends Activity implements OnCameraChangeListener, OnMapLoadedListener,
-	LocationSource, AMapLocationListener, OnMarkerClickListener {
+	LocationSource, AMapLocationListener, OnMarkerClickListener, InfoWindowAdapter {
 
 	private AMap mMap;
 	private MapView mapView;
@@ -50,6 +52,8 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 	private ArrayList<PointsClusterEntity> mClusterDatas;
 	private ClusterUtils utils;
 	
+	private float zoom; //记载缩放级别
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -58,8 +62,8 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 		actionBar.setDisplayHomeAsUpEnabled(false);//显示返回箭头
         actionBar.setDisplayShowHomeEnabled(false); 
         actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle("             烟台");
-		mapView = (MapView) findViewById(R.id.map);
+        actionBar.setTitle("                        "+"");
+		mapView = (MapView) findViewById(R.id.map_cluster);
 		mapView.onCreate(savedInstanceState);// 此方法必须重写
 	}
 
@@ -94,6 +98,7 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 			LatLng position = city.getCityPosition();
 			if(position != null) {
 				mMap.moveCamera(CameraUpdateFactory.changeLatLng(position));
+				this.getActionBar().setTitle("                          "+city.getCityName());
 			}
 		}
 			
@@ -108,17 +113,10 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 		scenicLists = CityScenicUtils.createCityScenics();
 		if (mMap == null) {
 			mMap = mapView.getMap();
-			setUpMap();
-			mMap.setOnCameraChangeListener(this);
 			mMap.setOnMapLoadedListener(this);
 			mMap.setOnMarkerClickListener(this);// 设置点击marker事件监听器
+			mMap.setInfoWindowAdapter(this);// 设置自定义InfoWindow样式
 		}
-		
-		//test
-//		for(ScenicModel each: scenicLists) {		
-//			MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 0.5f).position(each.getLatLng());
-//			mMap.addMarker(arg0);
-//		}
 		
 	}
 	
@@ -157,6 +155,7 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 	public void onLocationChanged(AMapLocation aLocation) {
 		if (mListener != null && aLocation != null) {
 			mListener.onLocationChanged(aLocation);// 显示系统小蓝点
+			this.getActionBar().setTitle("                          "+aLocation.getCity());
 		}
 	}
 
@@ -194,7 +193,10 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 	
 	@Override
 	public void onMapLoaded() {
+		zoom = mMap.getCameraPosition().zoom;
 		clusterShow();
+		setUpMap();
+		mMap.setOnCameraChangeListener(this);
 	}
 	
 	@Override
@@ -205,19 +207,12 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 	
     @Override
 	public void onCameraChangeFinish(CameraPosition cameraPosition) {
-    	clusterShow();
-    	
-	    VisibleRegion visibleRegion = mMap.getProjection().getVisibleRegion(); 
-	    // 获取可视区域
-//	    LatLngBounds latLngBounds = visibleRegion.latLngBounds;
-//	    if(!bounds.contains(latLngBounds))
-//	    {
-//	    // 获取可视区域的Bounds
-//	    //boolean isContain = latLngBounds.contains(Constants.SHANGHAI);
-//	    // 判断上海经纬度是否包括在当前地图可见区域
-//	    	LatLng center = new LatLng(37.520049,121.360109);
-//	    }
-	    
+    	if(cameraPosition.zoom == zoom) {
+    		
+    	} else {
+    		zoom = cameraPosition.zoom;
+    		clusterShow();
+    	}
 	}
 	
 	/**
@@ -290,11 +285,27 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 
 	@Override
 	public boolean onMarkerClick(Marker arg0) {
-		if(arg0.getObject().equals("1")) {
-			Intent intent = new Intent(ClusterActivity.this, MapActivity.class);
-			startActivity(intent);
+		if(arg0.getObject() != null) {//1marker
+			PointsClusterEntity result = (PointsClusterEntity)arg0.getObject();
+			if(result.getClusterCount() == 1) {
+				Intent intent = new Intent(ClusterActivity.this, MapActivity.class);
+				startActivity(intent);
+			}
 		}
 		
+		arg0.showInfoWindow();
 		return false;
+	}
+
+	@Override
+	public View getInfoContents(Marker arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public View getInfoWindow(Marker arg0) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

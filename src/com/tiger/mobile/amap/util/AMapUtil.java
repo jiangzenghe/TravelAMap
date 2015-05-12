@@ -13,7 +13,7 @@ import android.text.Html;
 import android.text.Spanned;
 import android.widget.EditText;
 
-import com.amap.api.maps2d.model.LatLng;
+import com.amap.api.maps.model.LatLng;
 import com.amap.api.services.core.LatLonPoint;
 
 public class AMapUtil {

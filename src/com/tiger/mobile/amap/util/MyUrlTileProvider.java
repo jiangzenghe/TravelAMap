@@ -5,7 +5,7 @@ import java.net.URL;
 
 import android.util.Log;
 
-import com.amap.api.maps2d.model.UrlTileProvider;
+import com.amap.api.maps.model.UrlTileProvider;
 public class MyUrlTileProvider extends UrlTileProvider{
 
 	 public MyUrlTileProvider(int tileWidth,int tileHeight) {

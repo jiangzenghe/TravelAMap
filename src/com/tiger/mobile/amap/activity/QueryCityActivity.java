@@ -112,7 +112,7 @@ public class QueryCityActivity extends Activity{
 		ActionBar actionBar = getActionBar();
 		actionBar.setDisplayHomeAsUpEnabled(true);// 显示返回箭头
 		actionBar.setDisplayShowHomeEnabled(false);	
-		actionBar.setTitle("             选择城市");
+		actionBar.setTitle("                        "+"选择城市");
 		// UI elements
 		setupViews();
 

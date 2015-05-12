@@ -6,9 +6,9 @@ import java.util.List;
 
 import android.graphics.Point;
 
-import com.amap.api.maps2d.AMap;
-import com.amap.api.maps2d.model.LatLng;
-import com.amap.api.maps2d.model.LatLngBounds;
+import com.amap.api.maps.AMap;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.LatLngBounds;
 
 
 /**

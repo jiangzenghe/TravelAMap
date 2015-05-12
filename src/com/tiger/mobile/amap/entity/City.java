@@ -3,7 +3,7 @@ package com.tiger.mobile.amap.entity;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.amap.api.maps2d.model.LatLng;
+import com.amap.api.maps.model.LatLng;
 
 
 /**

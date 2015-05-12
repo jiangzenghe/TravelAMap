@@ -1,6 +1,6 @@
 package com.tiger.mobile.amap.entity;
 
-import com.amap.api.maps2d.model.LatLng;
+import com.amap.api.maps.model.LatLng;
 
 
 /**

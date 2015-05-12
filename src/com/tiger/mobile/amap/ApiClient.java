@@ -1,6 +1,7 @@
 package com.tiger.mobile.amap;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
@@ -18,6 +19,8 @@ import com.tiger.mobile.amap.entity.ScenicAreaJson;
 import com.tiger.mobile.amap.entity.ScenicDetailJson;
 import com.tiger.mobile.amap.entity.ScenicIntroductionJson;
 import com.tiger.mobile.amap.entity.ScenicTransportJson;
+import com.tiger.mobile.amap.remote.model.RecommendLine;
+import com.tiger.mobile.amap.remote.model.ScenicPointJson;
 
 
 public class ApiClient {
@@ -26,7 +29,7 @@ public class ApiClient {
     public static IuuApiInterface getIuuApiClient() {
         if (sTwitchTvService == null) {
             RestAdapter restAdapter = new RestAdapter.Builder()
-                    .setEndpoint("http://192.168.1.104:8080/api")
+                    .setEndpoint("http://http://www.imyuu.com:8900/api")
                     .build();
             sTwitchTvService = restAdapter.create(IuuApiInterface.class);
         }
@@ -77,6 +80,11 @@ public class ApiClient {
         @GET("/detail/transport.do")
         void queryScenicTransport(@Query("scenicId") String scenicId,Callback<ScenicTransportJson> callback);
 
+        @GET("/map/allspot.do")
+        void queryScenicSpotLists(@Query("scenicId") String scenicId, Callback<List<ScenicPointJson>> callback);
+        @GET("/map/recommendLine.do")
+        void queryRecommendLines(@Query("scenicId") String scenicId, Callback<List<RecommendLine>> callback);
+        
        @Multipart
         @Headers({"Content-Type: image/jpeg"})
         @POST("/image/{imageName}/upload")

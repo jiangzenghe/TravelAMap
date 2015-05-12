@@ -1,6 +1,7 @@
 package com.tiger.mobile.amap.activity;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -19,6 +20,8 @@ import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
@@ -28,24 +31,39 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationListener;
 import com.amap.api.location.LocationManagerProxy;
 import com.amap.api.location.LocationProviderProxy;
-import com.amap.api.maps2d.AMap;
-import com.amap.api.maps2d.AMap.OnCameraChangeListener;
-import com.amap.api.maps2d.AMap.OnMapLoadedListener;
-import com.amap.api.maps2d.CameraUpdateFactory;
-import com.amap.api.maps2d.LocationSource;
-import com.amap.api.maps2d.LocationSource.OnLocationChangedListener;
-import com.amap.api.maps2d.MapView;
-import com.amap.api.maps2d.model.BitmapDescriptorFactory;
-import com.amap.api.maps2d.model.CameraPosition;
-import com.amap.api.maps2d.model.LatLng;
-import com.amap.api.maps2d.model.MyLocationStyle;
-import com.amap.api.maps2d.model.TileOverlay;
-import com.amap.api.maps2d.model.TileOverlayOptions;
-import com.amap.api.maps2d.model.VisibleRegion;
+import com.amap.api.maps.AMap;
+import com.amap.api.maps.AMap.InfoWindowAdapter;
+import com.amap.api.maps.AMap.OnCameraChangeListener;
+import com.amap.api.maps.AMap.OnMapLoadedListener;
+import com.amap.api.maps.AMap.OnMarkerClickListener;
+import com.amap.api.maps.CameraUpdateFactory;
+import com.amap.api.maps.LocationSource;
+import com.amap.api.maps.LocationSource.OnLocationChangedListener;
+import com.amap.api.maps.MapView;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
+import com.amap.api.maps.model.CameraPosition;
+import com.amap.api.maps.model.GroundOverlay;
+import com.amap.api.maps.model.GroundOverlayOptions;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.LatLngBounds;
+import com.amap.api.maps.model.Marker;
+import com.amap.api.maps.model.MarkerOptions;
+import com.amap.api.maps.model.MyLocationStyle;
+import com.amap.api.maps.model.PolylineOptions;
+import com.amap.api.maps.model.TileOverlay;
+import com.amap.api.maps.model.VisibleRegion;
+import com.amap.api.navi.AMapNavi;
+import com.amap.api.navi.AMapNaviListener;
+import com.amap.api.navi.model.AMapNaviInfo;
+import com.amap.api.navi.model.AMapNaviLocation;
+import com.amap.api.navi.model.AMapNaviPath;
+import com.amap.api.navi.model.NaviInfo;
+import com.amap.api.navi.model.NaviLatLng;
+import com.amap.api.navi.view.RouteOverLay;
 import com.tiger.mobile.amap.R;
 import com.tiger.mobile.amap.adapter.TestAdapter;
 import com.tiger.mobile.amap.entity.PointModel;
-import com.tiger.mobile.amap.util.MyUrlTileProvider;
+import com.tiger.mobile.amap.util.ToastUtil;
 import com.tiger.mobile.amap.util.Utils;
 import com.tiger.mobile.amap.view.ColumnHorizontalScrollView;
 import com.tiger.mobile.amap.view.GridView;
@@ -53,7 +71,7 @@ import com.tiger.mobile.amap.view.GridView;
  * AMapV1地图demo总汇
  */
 public final class MapActivity extends Activity implements OnCameraChangeListener, OnMapLoadedListener,
-	LocationSource, AMapLocationListener {
+	LocationSource, AMapLocationListener, OnMarkerClickListener, InfoWindowAdapter, AMapNaviListener{
 
 	private AMap mMap;
 	private MapView mapView;
@@ -63,11 +81,19 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 	private OnLocationChangedListener mListener;
 	private LocationManagerProxy mAMapLocationManager;
 	private TileOverlay tileOverlay;
+	private GroundOverlay groundoverlay;
+	private AMapNavi mAMapNavi;
 	private ColumnHorizontalScrollView mColumnHorizontalScrollView;
 	private LinearLayout mRoute_layout;
 	private RelativeLayout rl_column;
 	/** 当前选中的栏目*/
 	private int columnSelectIndex = 0;
+	
+	private float zoom;
+	private NaviLatLng mNaviEnd = new NaviLatLng(37.5206,121.358);
+	private NaviLatLng mNaviStart;
+	// 规划线路
+	private RouteOverLay mRouteOverLay;
 	
 	/** 分类列表*/
 	private ArrayList<PointModel> routeList=new ArrayList<PointModel>();
@@ -84,18 +110,26 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 		actionBar.setDisplayHomeAsUpEnabled(true);//显示返回箭头
         actionBar.setDisplayShowHomeEnabled(false);
         actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle("             崂山风景区");
+        actionBar.setTitle("                        "+"崂山风景区");
 		mapView = (MapView) findViewById(R.id.map);
 		mapView.onCreate(savedInstanceState);// 此方法必须重写
 		
 		mScreenWidth = Utils.getWindowsWidth(this);
 		mItemWidth = mScreenWidth / 4;
 		routeList = new ArrayList<PointModel>();
-		routeList.add(new PointModel(new LatLng(25.299542,110.301648),"1","点1"));
-		routeList.add(new PointModel(new LatLng(25.399544,110.401650),"2","点2"));
-		routeList.add(new PointModel(new LatLng(25.499545,110.501651),"3","点3"));
-		routeList.add(new PointModel(new LatLng(25.599546,110.601652),"4","点4"));
-		
+		routeList.add(new PointModel(new LatLng(37.5206,121.358),"1","点1"));
+		routeList.add(new PointModel(new LatLng(37.52035611111111,121.35697888888889),"2","点2"));
+		routeList.add(new PointModel(new LatLng(37.52030416666667,121.3575125),"3","点3"));
+		routeList.add(new PointModel(new LatLng(37.52028694444444,121.35767722222222),"4","点4"));
+		routeList.add(new PointModel(new LatLng(37.52028194444444,121.35767777777778),"5","点5"));
+		routeList.add(new PointModel(new LatLng(37.520381666666665,121.357695),"6","点6"));
+		routeList.add(new PointModel(new LatLng(37.52054638888889,121.35772527777777),"7","点7"));
+		initView();
+	}
+
+	private void initView() {
+		mAMapNavi = AMapNavi.getInstance(this);
+		mAMapNavi.setAMapNaviListener(this);
 		rl_column = (RelativeLayout) findViewById(R.id.rl_column);
 		mRoute_layout = (LinearLayout) findViewById(R.id.layout_route);
 		mColumnHorizontalScrollView = (ColumnHorizontalScrollView) findViewById(R.id.mColumnHorizontalScrollView);
@@ -121,6 +155,13 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
                     // 隐藏窗口，如果设置了点击窗口外小时即不需要此方式隐藏 
                     pop.dismiss(); 
                 } else { 
+                	if(rl_column.getVisibility() == View.VISIBLE) {
+                		Drawable nav_up=getResources().getDrawable(R.drawable.uparrow);
+                		nav_up.setBounds(0, 0, nav_up.getMinimumWidth(), nav_up.getMinimumHeight());
+						routeText.setCompoundDrawables(nav_up,null,null,null);
+                		rl_column.setVisibility(View.GONE);
+                		return;
+                	}
                     // 显示窗口 
                 	int[] location = new int[2];  
                     v.getLocationOnScreen(location);  
@@ -134,6 +175,10 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 						@Override
 						public void onClick(View v) {
 							if(pop.isShowing()) pop.dismiss();
+							mRouteOverLay.removeFromMap();
+							Drawable nav_down=getResources().getDrawable(R.drawable.downarrow);
+							nav_down.setBounds(0, 0, nav_down.getMinimumWidth(), nav_down.getMinimumHeight());
+							routeText.setCompoundDrawables(nav_down,null,null,null);
 							rl_column.setVisibility(View.GONE);
 	                    	Animation mShowAction = AnimationUtils.loadAnimation(MapActivity.this, R.anim.right_in);
 	    					rl_column.setAnimation(mShowAction);
@@ -146,6 +191,10 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 						@Override
 						public void onClick(View v) {
 							if(pop.isShowing()) pop.dismiss();
+							mRouteOverLay.removeFromMap();
+							Drawable nav_down=getResources().getDrawable(R.drawable.downarrow);
+							nav_down.setBounds(0, 0, nav_down.getMinimumWidth(), nav_down.getMinimumHeight());
+							routeText.setCompoundDrawables(nav_down,null,null,null);
 							rl_column.setVisibility(View.GONE);
 	                    	Animation mShowAction = AnimationUtils.loadAnimation(MapActivity.this, R.anim.right_in);
 	    					rl_column.setAnimation(mShowAction);
@@ -184,7 +233,7 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 		initColumn();
 		initGridView();
 	}
-
+	
 	/** 
 	 *  初始化Column栏目项
 	 * */
@@ -278,6 +327,18 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 		titles.add("更多");
 		TestAdapter adapter = new TestAdapter(MapActivity.this, titles, images);
 		layoutShow.setAdapter(adapter);
+		layoutShow.setOnItemClickListener(new OnItemClickListener(){
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				MarkerOptions marker = new MarkerOptions().anchor(0.5f, 1.0f)
+						.position(new LatLng(37.5206,121.358));
+				mMap.addMarker(marker);
+				calculateFootRoute();
+			}
+			
+		});
 	}
 	
 	@Override
@@ -306,9 +367,11 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 			setUpMap();
 			mMap.setOnCameraChangeListener(this);
 			mMap.setOnMapLoadedListener(this);
-			mMap.getUiSettings().setCompassEnabled(true);
+			mMap.setOnMarkerClickListener(this);// 设置点击marker事件监听器
+			mMap.setInfoWindowAdapter(this);// 设置自定义InfoWindow样式
+			
+			mMap.getUiSettings().setCompassEnabled(false);
 			mMap.getUiSettings().setZoomControlsEnabled(false);
-//			mMap.getUiSettings().setZoomPosition(AMapOptions.ZOOM_POSITION_RIGHT_CENTER);
 		}
 		
 	}
@@ -326,7 +389,7 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 		mMap.setMyLocationStyle(myLocationStyle);// 将自定义的 myLocationStyle 对象添加到地图上
 		mMap.setLocationSource(this);// 设置定位监听 //设置定位资源。如果不设置此定位资源则定位按钮不可点击。
 		mMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
-		mMap.setMyLocationEnabled(false);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
+		mMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
  
 	}
 	
@@ -337,6 +400,7 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 	public void onLocationChanged(AMapLocation aLocation) {
 		if (mListener != null && aLocation != null) {
 			mListener.onLocationChanged(aLocation);// 显示系统小蓝点
+			mNaviStart = new NaviLatLng(aLocation.getLatitude(), aLocation.getLongitude());
 		}
 	}
 
@@ -374,6 +438,10 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 	
 	@Override
 	public void onMapLoaded() {
+		zoom = mMap.getCameraPosition().zoom;
+		// 设置所有maker显示在View中
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+				new LatLng(37.5206,121.358), 18));
 		addOverlayToMap();
 	}
 	
@@ -381,17 +449,27 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 	 * 往地图上添加一个groundoverlay覆盖物
 	 */
 	private void addOverlayToMap() {
-		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-				new LatLng(25.29954199,110.30164737), 18));
-		if (tileOverlay != null)
-        {
-            tileOverlay.remove();
-        }
-		tileOverlay = mMap.addTileOverlay((new TileOverlayOptions())
-        		.tileProvider(new MyUrlTileProvider(256, 256))
-        		.diskCacheEnabled(true).diskCacheSize(100)
-        		.zIndex(-10));
-		tileOverlay.setVisible(true);
+//		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+//				new LatLng(25.29954199,110.30164737), 18));
+//		if (tileOverlay != null)
+//        {
+//            tileOverlay.remove();
+//        }
+//		tileOverlay = mMap.addTileOverlay((new TileOverlayOptions())
+//        		.tileProvider(new MyUrlTileProvider(256, 256))
+//        		.diskCacheEnabled(true).diskCacheSize(100)
+//        		.zIndex(-10));
+//		tileOverlay.setVisible(true);
+		mRouteOverLay = new RouteOverLay(mMap, null);
+		LatLngBounds bounds = new LatLngBounds.Builder()
+        .include(new LatLng(37.515658,121.352212))
+		.include(new LatLng(37.528217,121.365323)).build();
+		groundoverlay = mMap.addGroundOverlay(new GroundOverlayOptions()
+		.anchor(0.5f, 0.5f)
+		.transparency(0f)
+		.image(BitmapDescriptorFactory
+				.fromResource(R.drawable.groundoverlay))
+		.positionFromBounds(bounds).zIndex(-10));
 		
 	}
 	
@@ -403,18 +481,19 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 	
     @Override
 	public void onCameraChangeFinish(CameraPosition cameraPosition) {
+    	zoom = cameraPosition.zoom;
     	
 	    VisibleRegion visibleRegion = mMap.getProjection().getVisibleRegion(); 
+	    LatLngBounds bounds = new LatLngBounds.Builder()
+        .include(new LatLng(37.515658,121.352212))
+		.include(new LatLng(37.528217,121.365323)).build();
 	    // 获取可视区域
-//	    LatLngBounds latLngBounds = visibleRegion.latLngBounds;
-//	    if(!bounds.contains(latLngBounds))
-//	    {
-//	    // 获取可视区域的Bounds
-//	    //boolean isContain = latLngBounds.contains(Constants.SHANGHAI);
-//	    // 判断上海经纬度是否包括在当前地图可见区域
-//	    	LatLng center = new LatLng(37.520049,121.360109);
-//	    }
-	    
+	    LatLngBounds curBounds = visibleRegion.latLngBounds;
+	    if(!bounds.contains(curBounds))
+	    {
+//	    	mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+//					new LatLng(37.522,121.356), 18));
+	    }
 	}
 	
 	/**
@@ -480,6 +559,145 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public View getInfoContents(Marker arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public View getInfoWindow(Marker arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean onMarkerClick(Marker arg0) {
+		// TODO Auto-generated method stub
+//		calculateFootRoute();
+		return false;
+	}
+
+	//计算步行路线
+	private void calculateFootRoute() {
+		if(mNaviStart != null) {
+			boolean isSuccess = mAMapNavi.calculateWalkRoute(mNaviStart ,mNaviEnd);
+			if (!isSuccess) {
+				ToastUtil.show(this, "路线计算失败,检查参数情况");
+			}
+		}
+	}
+	
+	@Override
+	public void onArriveDestination() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onArrivedWayPoint(int arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onCalculateRouteFailure(int arg0) {
+		// TODO Auto-generated method stub
+		ToastUtil.show(this, "路径规划出错" + arg0);
+	}
+
+	@Override
+	public void onCalculateRouteSuccess() {
+		AMapNaviPath naviPath = mAMapNavi.getNaviPath();
+		if (naviPath == null) {
+			return;
+		}
+		List<NaviLatLng> arg0 = naviPath.getCoordList();
+		ArrayList<LatLng> arg1 = new ArrayList<LatLng>();
+		// 获取路径规划线路，显示到地图上
+		mRouteOverLay.setRouteInfo(naviPath);
+		mRouteOverLay.addToMap();
+		mRouteOverLay.drawArrow(arg0);
+//		for(NaviLatLng each:arg0) {
+//			arg1.add(new LatLng(each.getLatitude(),each.getLongitude()));
+//			mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f).position(new LatLng(each.getLatitude(),each.getLongitude())));
+//		}
+//		mMap.addPolyline(new PolylineOptions().addAll(arg1).color(Color.RED).visible(true));
+		
+	}
+
+	@Override
+	public void onEndEmulatorNavi() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onGetNavigationText(int arg0, String arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onGpsOpenStatus(boolean arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onInitNaviFailure() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onInitNaviSuccess() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onLocationChange(AMapNaviLocation arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onNaviInfoUpdate(NaviInfo arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onNaviInfoUpdated(AMapNaviInfo arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onReCalculateRouteForTrafficJam() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onStartNavi(int arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onTrafficStatusUpdate() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onReCalculateRouteForYaw() {
 		// TODO Auto-generated method stub
 		
 	}

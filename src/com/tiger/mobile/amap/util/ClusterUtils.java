@@ -8,10 +8,12 @@ import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
-import com.amap.api.maps2d.AMap;
-import com.amap.api.maps2d.model.LatLng;
-import com.amap.api.maps2d.model.Marker;
-import com.amap.api.maps2d.model.MarkerOptions;
+import com.amap.api.maps.AMap;
+import com.amap.api.maps.model.BitmapDescriptorFactory;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.Marker;
+import com.amap.api.maps.model.MarkerOptions;
+import com.tiger.mobile.amap.R;
 import com.tiger.mobile.amap.entity.PointsClusterEntity;
 import com.tiger.mobile.amap.entity.ScenicModel;
 
@@ -33,7 +35,6 @@ public class ClusterUtils {
 		super();
 		this.activity = activity;
 		this.aMap = aMap;
-//		this.commonLayer = commonLayer;
 		handler = new Handler();
 		this.pointsList = pointsList;
 		DisplayMetrics dm = new DisplayMetrics();
@@ -59,7 +60,7 @@ public class ClusterUtils {
 				for (PointsClusterEntity cluster : clustersList) {
 					if (cluster.getBoundsEnv().contains(fp.getLatLng())) {
 						cluster.setClusterCount(cluster.getClusterCount() + 1);
-						
+						cluster.setText("该地区共有"+cluster.getClusterCount()+"个景区");
 						ScenicModel object = new ScenicModel();
 						object.setLatLng(fp.getLatLng());
 						cluster.getSubScenicEntity().add(object);
@@ -87,7 +88,6 @@ public class ClusterUtils {
 				gridSize);
 		arg0.setClusterCount(1);
 		arg0.setClusterId(normalClustList.size() + 1 + "");
-		
 		ScenicModel object = new ScenicModel();
 		object.setLatLng(point);
 		arg0.getSubScenicEntity().add(object);
@@ -100,8 +100,9 @@ public class ClusterUtils {
 		ArrayList<Marker> markerList = (ArrayList)aMap.getMapScreenMarkers();
 		if(markerList!=null) {
 			for(Marker each:markerList) {
-				if(each.getObject() != null && each.getObject().equals("1")) {
+				if(each.getObject() != null) {
 					each.remove();
+					each.destroy();
 				}
 			}
 		}
@@ -109,8 +110,20 @@ public class ClusterUtils {
 		for (PointsClusterEntity each : mClusterDatas){
 			MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f)
 					.position(new LatLng(each.getLat(), each.getLng()));
+			arg0.title(each.getText());
+			if(each.getClusterCount() > 1) {
+				if(each.getClusterCount() == 2) {
+					arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.h_middle));
+				} else if(each.getClusterCount() == 3) {
+					arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.h_high));
+				} else {
+					arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.h_highest));
+				}
+			} else {
+				arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.h_low));
+			}
 			Marker eachMarker = aMap.addMarker(arg0);
-			eachMarker.setObject("1");//1--景点聚合标志
+			eachMarker.setObject(each);//1--景区聚合标志
 		}
 		
 		//test the time to draw
