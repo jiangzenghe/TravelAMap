@@ -62,9 +62,17 @@ public class ClusterUtils {
 			} else {
 				boolean isIn = false;
 				for (PointsClusterEntity cluster : clustersList) {
-					if (cluster.getBoundsEnv().contains(fp.getLatLng())) {
+					if (cluster.getBoundsEnv() != null && cluster.getBoundsEnv().contains(fp.getLatLng())) {
 						cluster.setClusterCount(cluster.getClusterCount() + 1);
-						cluster.setText("该地区共有"+cluster.getClusterCount()+"个景区");
+						if(cluster.getClusterCount()==2) {
+							String replaceText = "该地区共有"+cluster.getClusterCount()+"个景区，依次为"
+									+cluster.getText()+"和"+fp.getScenicName();
+							cluster.setText(replaceText);
+						} else {
+							String addText = "和" + fp.getScenicName();
+							cluster.setText(cluster.getText()+addText);
+						}
+//						cluster.setTitle("该地区共有"+cluster.getClusterCount()+"个景区");
 						ScenicModel object = new ScenicModel();
 						object.setLatLng(fp.getLatLng());
 						cluster.getSubScenicEntity().add(object);
@@ -94,7 +102,9 @@ public class ClusterUtils {
 		arg0.setClusterId(normalClustList.size() + 1 + "");
 		ScenicModel object = new ScenicModel();
 		object.setLatLng(point);
+		object.setScenicName(each.getScenicName());
 		arg0.getSubScenicEntity().add(object);
+		arg0.setText(each.getScenicName());
 		normalClustList.add(arg0);
 	}
 	
@@ -151,11 +161,11 @@ public class ClusterUtils {
 		 	Bitmap bitmap = BitmapDescriptorFactory.fromResource(sourceId).getBitmap();
 			bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
 			             bitmap.getHeight());
-//			Canvas canvas = new Canvas(bitmap);
-//			TextPaint textPaint = new TextPaint();
-//			textPaint.setTextSize(20f);
-//			textPaint.setColor(Color.RED);
-//			canvas.drawText(text, 18, 30, textPaint);// 设置bitmap上面的文字位置
+			Canvas canvas = new Canvas(bitmap);
+			TextPaint textPaint = new TextPaint();
+			textPaint.setTextSize(20f);
+			textPaint.setColor(Color.RED);
+			canvas.drawText(text, 18, 30, textPaint);// 设置bitmap上面的文字位置
 			return bitmap;
 			}
 	

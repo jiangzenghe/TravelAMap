@@ -29,7 +29,7 @@ public class ApiClient {
     public static IuuApiInterface getIuuApiClient() {
         if (sTwitchTvService == null) {
             RestAdapter restAdapter = new RestAdapter.Builder()
-                    .setEndpoint("http://http://www.imyuu.com:8900/api")
+                    .setEndpoint("http://www.imyuu.com:8900/api")
                     .build();
             sTwitchTvService = restAdapter.create(IuuApiInterface.class);
         }

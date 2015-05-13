@@ -1,6 +1,7 @@
 package com.tiger.mobile.amap.adapter;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -28,13 +29,15 @@ import com.tiger.mobile.amap.R;
 public class TestAdapter extends BaseAdapter{
 	
 	private ArrayList<String> titles;
+	private ArrayList<String> keys;
 	private ArrayList<Drawable> images;
 	private LayoutInflater inflater = null;
 	private Activity activity;
 	
-	public TestAdapter(Activity activity, ArrayList<String> titles, ArrayList<Drawable> images) {
+	public TestAdapter(Activity activity, ArrayList<String> titles, ArrayList<String> keys, ArrayList<Drawable> images) {
 		this.images = images;
 		this.titles = titles;
+		this.keys = keys;
 		inflater = LayoutInflater.from(activity);
 	}
 	
@@ -50,11 +53,18 @@ public class TestAdapter extends BaseAdapter{
 	@Override
 	public String getItem(int position) {
 		if (titles != null && titles.size() != 0) {
-			return titles.get(position);
+			return keys.get(position);
 		}
 		return null;
 	}
 
+	public String getItemText(int position) {
+		if (titles != null && titles.size() != 0) {
+			return titles.get(position);
+		}
+		return null;
+	}
+	
 	@Override
 	public long getItemId(int position) {
 		return position;
@@ -77,7 +87,7 @@ public class TestAdapter extends BaseAdapter{
 			mHolder = (ViewHolder) view.getTag();
 		}
 		//获取position对应的数据
-		String title = getItem(position);
+		String title = getItemText(position);
 		mHolder.center_image.setBackgroundDrawable(images.get(position));
 		mHolder.center_title.setText(title);
 		

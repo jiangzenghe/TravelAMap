@@ -40,6 +40,7 @@ import com.amap.api.location.LocationProviderProxy;
 import com.amap.api.maps.AMap;
 import com.amap.api.maps.AMap.InfoWindowAdapter;
 import com.amap.api.maps.AMap.OnCameraChangeListener;
+import com.amap.api.maps.AMap.OnInfoWindowClickListener;
 import com.amap.api.maps.AMap.OnMapLoadedListener;
 import com.amap.api.maps.AMap.OnMarkerClickListener;
 import com.amap.api.maps.CameraUpdateFactory;
@@ -52,10 +53,8 @@ import com.amap.api.maps.model.GroundOverlayOptions;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.Marker;
-import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.maps.model.PolylineOptions;
-import com.amap.api.maps.model.TileOverlay;
 import com.amap.api.maps.model.VisibleRegion;
 import com.amap.api.navi.AMapNavi;
 import com.amap.api.navi.AMapNaviListener;
@@ -69,7 +68,9 @@ import com.tiger.mobile.amap.ApiClient;
 import com.tiger.mobile.amap.R;
 import com.tiger.mobile.amap.adapter.TestAdapter;
 import com.tiger.mobile.amap.entity.PointModel;
-import com.tiger.mobile.amap.remote.model.ScenicDetailJson;
+import com.tiger.mobile.amap.remote.model.ScenicPointJson;
+import com.tiger.mobile.amap.util.MarkerUtils;
+import com.tiger.mobile.amap.util.Palyer;
 import com.tiger.mobile.amap.util.ToastUtil;
 import com.tiger.mobile.amap.util.Utils;
 import com.tiger.mobile.amap.view.ColumnHorizontalScrollView;
@@ -78,7 +79,7 @@ import com.tiger.mobile.amap.view.GridView;
  * AMapV1地图demo总汇
  */
 public final class MapActivity extends Activity implements OnCameraChangeListener, OnMapLoadedListener,
-	LocationSource, AMapLocationListener, OnMarkerClickListener, InfoWindowAdapter, AMapNaviListener{
+	LocationSource, AMapLocationListener, OnMarkerClickListener, InfoWindowAdapter, AMapNaviListener, OnInfoWindowClickListener{
 
 	private AMap mMap;
 	private MapView mapView;
@@ -87,7 +88,6 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 	private GridView layoutShow;
 	private OnLocationChangedListener mListener;
 	private LocationManagerProxy mAMapLocationManager;
-	private TileOverlay tileOverlay;
 	private GroundOverlay groundoverlay;
 	private AMapNavi mAMapNavi;
 	private ColumnHorizontalScrollView mColumnHorizontalScrollView;
@@ -99,13 +99,16 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 	private int columnSelectIndex = 0;
 	
 	private float zoom;
-	private NaviLatLng mNaviEnd = new NaviLatLng(37.5206,121.358);
+//	private NaviLatLng mNaviEnd = new NaviLatLng(37.5206,121.358);
+	private NaviLatLng mNaviEnd;
 	private NaviLatLng mNaviStart;
 	// 规划线路
 	private RouteOverLay mRouteOverLay;
 	
 	/** 分类列表*/
 	private ArrayList<PointModel> routeList=new ArrayList<PointModel>();
+	private ArrayList<ScenicPointJson> markerList=new ArrayList<ScenicPointJson>();
+	private MarkerUtils markerUtils;
 	/** 屏幕宽度 */
 	private int mScreenWidth = 0;
 	/** Item宽度 */
@@ -123,11 +126,10 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 		mapView = (MapView) findViewById(R.id.map);
 		mapView.onCreate(savedInstanceState);// 此方法必须重写
 		
-//		createNet();
-		
 		mScreenWidth = Utils.getWindowsWidth(this);
 		mItemWidth = mScreenWidth / 4;
 		routeList = new ArrayList<PointModel>();
+		markerList = new ArrayList<ScenicPointJson>();
 		routeList.add(new PointModel(new LatLng(37.5206,121.358),"1","点1"));
 		routeList.add(new PointModel(new LatLng(37.52035611111111,121.35697888888889),"2","点2"));
 		routeList.add(new PointModel(new LatLng(37.52030416666667,121.3575125),"3","点3"));
@@ -136,20 +138,6 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 		routeList.add(new PointModel(new LatLng(37.520381666666665,121.357695),"6","点6"));
 		routeList.add(new PointModel(new LatLng(37.52054638888889,121.35772527777777),"7","点7"));
 		initView();
-	}
-	
-	private void createNet() {
-		ApiClient.getIuuApiClient().queryScenicDetail("22", new Callback<ScenicDetailJson>() {
-	        @Override
-	        public void success(ScenicDetailJson scenicDetailJson, Response response) {
-	        	Toast.makeText(MapActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
-	        }
-
-	        @Override
-	        public void failure(RetrofitError error) {
-	            Toast.makeText(MapActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
-	        }
-	    });
 	}
 
 	private void initView() {
@@ -254,7 +242,6 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
                    
             } 
         }); 
-//		layoutShow.setVisibility(View.VISIBLE);
 		cilckText.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
@@ -334,50 +321,60 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 	
 	private void initGridView() {
 		ArrayList<String> titles = new ArrayList<String>();
+		ArrayList<String> keys = new ArrayList<String>();
 		ArrayList<Drawable> images = new ArrayList<Drawable>();
 		
 		Drawable object0 = 
-				this.getResources().getDrawable(R.drawable.image01);
+				this.getResources().getDrawable(R.drawable.item_toilet);
 		images.add(object0);
 		titles.add("洗手间");
+		keys.add("2");
 		Drawable object1 = 
-				this.getResources().getDrawable(R.drawable.image02);
+				this.getResources().getDrawable(R.drawable.item_rope);
 		images.add(object1);
 		titles.add("索道");
+		keys.add("3");
 		Drawable object2 = 
-				this.getResources().getDrawable(R.drawable.image03);
+				this.getResources().getDrawable(R.drawable.item_dock);
 		images.add(object2);
 		titles.add("码头");
+		keys.add("4");
 		Drawable object3 = 
-				this.getResources().getDrawable(R.drawable.image04);
+				this.getResources().getDrawable(R.drawable.item_service);
 		images.add(object3);
-		titles.add("服务点");
+		titles.add("服务中心");
+		keys.add("5");
 		Drawable object4 = 
-				this.getResources().getDrawable(R.drawable.image05);
+				this.getResources().getDrawable(R.drawable.item_park);
 		images.add(object4);
 		titles.add("停车场");
+		keys.add("6");
 		Drawable object5 = 
-				this.getResources().getDrawable(R.drawable.image06);
+				this.getResources().getDrawable(R.drawable.item_exchange);
 		images.add(object5);
-		titles.add("换乘点");
+		titles.add("换乘中心");
+		keys.add("7");
 		Drawable object6 = 
-				this.getResources().getDrawable(R.drawable.image07);
+				this.getResources().getDrawable(R.drawable.item_ticket);
 		images.add(object6);
 		titles.add("售票处");
+		keys.add("8");
 		Drawable object7 = 
-				this.getResources().getDrawable(R.drawable.image08);
+				this.getResources().getDrawable(R.drawable.item_inexit);
 		images.add(object7);
+		keys.add("9");
 		titles.add("出入口");
-		TestAdapter adapter = new TestAdapter(MapActivity.this, titles, images);
+		final TestAdapter adapter = new TestAdapter(MapActivity.this, titles, keys, images);
 		layoutShow.setAdapter(adapter);
 		layoutShow.setOnItemClickListener(new OnItemClickListener(){
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				MarkerOptions marker = new MarkerOptions().anchor(0.5f, 1.0f)
-						.position(new LatLng(37.5206,121.358));
-				mMap.addMarker(marker);
+				String item = adapter.getItem(arg2);
+				markerUtils.removeAllAddition();
+				markerUtils.addMarkerGrphic(item);
+				
 			}
 			
 		});
@@ -411,7 +408,7 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 			mMap.setOnMapLoadedListener(this);
 			mMap.setOnMarkerClickListener(this);// 设置点击marker事件监听器
 			mMap.setInfoWindowAdapter(this);// 设置自定义InfoWindow样式
-			
+			mMap.setOnInfoWindowClickListener(this);// 设置点击infoWindow事件监听器
 			mMap.getUiSettings().setCompassEnabled(false);
 			mMap.getUiSettings().setZoomControlsEnabled(false);
 		}
@@ -431,7 +428,7 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 		mMap.setMyLocationStyle(myLocationStyle);// 将自定义的 myLocationStyle 对象添加到地图上
 		mMap.setLocationSource(this);// 设置定位监听 //设置定位资源。如果不设置此定位资源则定位按钮不可点击。
 		mMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
-		mMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
+		mMap.setMyLocationEnabled(false);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
  
 	}
 	
@@ -485,35 +482,50 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
 				new LatLng(36.1427,120.6837), 18));  //37.5206,121.358
 		addOverlayToMap();
+		getScenicSpotsNet();
+	}
+	
+
+	private void getScenicSpotsNet() {
+		ApiClient.getIuuApiClient().queryScenicSpotLists("394", new Callback<List<ScenicPointJson>>() {
+	        @Override
+	        public void success(List<ScenicPointJson> resultJson, Response response) {
+	        	Toast.makeText(MapActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
+	        	if(resultJson == null) {
+	        		Toast.makeText(MapActivity.this, "结果为空", Toast.LENGTH_SHORT).show();
+	        	}
+	        	markerList = (ArrayList)resultJson;
+	        	markerUtils = new MarkerUtils(MapActivity.this, mMap, markerList);
+	        	addMarkerFunc("1");
+	        }
+
+	        @Override
+	        public void failure(RetrofitError error) {
+	            Toast.makeText(MapActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
+	        }
+	    });
 	}
 	
 	/**
 	 * 往地图上添加一个groundoverlay覆盖物
 	 */
 	private void addOverlayToMap() {
-//		mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-//				new LatLng(25.29954199,110.30164737), 18));
-//		if (tileOverlay != null)
-//        {
-//            tileOverlay.remove();
-//        }
-//		tileOverlay = mMap.addTileOverlay((new TileOverlayOptions())
-//        		.tileProvider(new MyUrlTileProvider(256, 256))
-//        		.diskCacheEnabled(true).diskCacheSize(100)
-//        		.zIndex(-10));
-//		tileOverlay.setVisible(true);
 		mRouteOverLay = new RouteOverLay(mMap, null);
 		LatLngBounds bounds = new LatLngBounds.Builder()
         .include(new LatLng(36.1377,120.6737))
-		.include(new LatLng(36.1415,120.6758)).build();
+		.include(new LatLng(36.1415,120.677862)).build();
 		groundoverlay = mMap.addGroundOverlay(new GroundOverlayOptions()
 		.anchor(0.5f, 0.5f)
 		.transparency(0f)
 		.image(BitmapDescriptorFactory.fromResource(R.drawable.laoshan))
 //		.image(BitmapDescriptorFactory
-//				.fromPath(Environment.getExternalStorageDirectory().getAbsolutePath()+"/imyuu/laoshan.png"))
-		.positionFromBounds(bounds).zIndex(-10));
+//				.fromPath(Environment.getExternalStorageDirectory().getAbsolutePath()+"/backups/laoshan_middle.jpg"))
+		.positionFromBounds(bounds).zIndex(1));
 		
+	}
+	
+	private void addMarkerFunc(String spotype) {
+		markerUtils.addMarkerGrphic(spotype);
 	}
 	
 	@Override
@@ -525,6 +537,12 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
     @Override
 	public void onCameraChangeFinish(CameraPosition cameraPosition) {
     	zoom = cameraPosition.zoom;
+    	
+    	if(markerUtils!=null && zoom < 17 ) {
+    		markerUtils.setAllUnVisible();
+    	} else if(markerUtils!=null) {
+    		markerUtils.setAllVisible();
+    	}
     	
 	    VisibleRegion visibleRegion = mMap.getProjection().getVisibleRegion(); 
 	    LatLngBounds bounds = new LatLngBounds.Builder()
@@ -613,21 +631,82 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 	}
 
 	@Override
-	public View getInfoWindow(Marker arg0) {
+	public View getInfoWindow(Marker marker) {
 		// TODO Auto-generated method stub
-		return null;
+		if(marker.getObject() != null) {//1marker			
+			View infoWindow = getLayoutInflater().inflate(
+					R.layout.custom_info_window, null);
+			
+			render(marker, infoWindow);
+			return infoWindow;
+		} else {			
+			return null;
+		}
+		
 	}
 
+	/**
+	 * 监听点击infowindow窗口事件回调
+	 */
+	@Override
+	public void onInfoWindowClick(Marker marker) {
+		if(marker.getObject() != null) {//1marker			
+			marker.showInfoWindow();
+		}
+		ToastUtil.show(this, "你点击了infoWindow窗口" + marker.getTitle());
+	}
+	
 	@Override
 	public boolean onMarkerClick(Marker arg0) {
 		// TODO Auto-generated method stub
-//		calculateFootRoute();
+//		if(arg0.getObject() != null) {//1marker
+//			
+//		}
+		if(arg0.getObject() != null) {//1marker			
+			arg0.showInfoWindow();
+		}
 		return false;
 	}
 
+	/**
+	 * 自定义infowinfow窗口
+	 */
+	public void render(Marker marker, View view) {
+		final TextView voiceView = (TextView) view.findViewById(R.id.voice);
+		final TextView naviView = (TextView) view.findViewById(R.id.navi);
+		
+		final ScenicPointJson point = (ScenicPointJson)marker.getObject();
+		if(point.getSpotType().equals("1")) {
+			voiceView.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					// TODO Auto-generated method stub
+					Palyer player = new Palyer();
+					player.playUrl(Environment.getExternalStorageDirectory().getAbsolutePath()
+							+"/Music/anyone of us.mp3");
+				}
+			
+			});
+		} else {
+			voiceView.setVisibility(View.GONE);
+		}
+		naviView.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				mNaviEnd = new NaviLatLng(point.getLat(), point.getLng());
+				calculateFootRoute();
+			}
+			
+		});
+		
+	}
+	
 	//计算步行路线
 	private void calculateFootRoute() {
-		if(mNaviStart != null) {
+		if(mNaviStart != null && mNaviEnd !=null) {
 			boolean isSuccess = mAMapNavi.calculateWalkRoute(mNaviStart ,mNaviEnd);
 			if (!isSuccess) {
 				ToastUtil.show(this, "路线计算失败,检查参数情况");

@@ -2,6 +2,10 @@ package com.tiger.mobile.amap.activity;
 
 import java.util.ArrayList;
 
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
@@ -11,6 +15,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationListener;
@@ -30,10 +35,13 @@ import com.amap.api.maps.model.CameraPosition;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MyLocationStyle;
+import com.tiger.mobile.amap.ApiClient;
 import com.tiger.mobile.amap.R;
 import com.tiger.mobile.amap.entity.City;
 import com.tiger.mobile.amap.entity.PointsClusterEntity;
 import com.tiger.mobile.amap.entity.ScenicModel;
+import com.tiger.mobile.amap.remote.model.ScenicAreaJson;
+import com.tiger.mobile.amap.remote.model.ScenicDetailJson;
 import com.tiger.mobile.amap.util.CityScenicUtils;
 import com.tiger.mobile.amap.util.ClusterUtils;
 
@@ -65,6 +73,7 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
         actionBar.setTitle("                        "+"");
 		mapView = (MapView) findViewById(R.id.map_cluster);
 		mapView.onCreate(savedInstanceState);// 此方法必须重写
+		
 	}
 
 	@Override
@@ -110,7 +119,7 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 	private void init() {
 		scenicLists = new ArrayList<ScenicModel>();
 		mClusterDatas = new ArrayList<PointsClusterEntity>();
-		scenicLists = CityScenicUtils.createCityScenics();
+		
 		if (mMap == null) {
 			mMap = mapView.getMap();
 			mMap.setOnMapLoadedListener(this);
@@ -118,6 +127,37 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 			mMap.setInfoWindowAdapter(this);// 设置自定义InfoWindow样式
 		}
 		
+	}
+	
+	private void getScenics() {
+//		scenicLists = CityScenicUtils.createCityScenics();
+//		clusterShow();
+//		setUpMap();
+//		mMap.setOnCameraChangeListener(ClusterActivity.this);
+		ApiClient.getIuuApiClient().getScenicListbyPage(50, 10, new Callback<ArrayList<ScenicAreaJson>>() {
+	        @Override
+	        public void success(ArrayList<ScenicAreaJson> result, Response response) {
+	        	Toast.makeText(ClusterActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
+	        	if(result == null) {
+	        		Toast.makeText(ClusterActivity.this, "数据为空", Toast.LENGTH_SHORT).show();
+	        	}
+	        	scenicLists.clear();
+	        	for(ScenicAreaJson each:result) {
+	        		ScenicModel object = new ScenicModel();
+	        		object.setLatLng(new LatLng(each.getLat(), each.getLng()));
+	        		object.setScenicName(each.getScenicName());
+	        		scenicLists.add(object);
+	        	}
+	        	clusterShow();
+	    		setUpMap();
+	    		mMap.setOnCameraChangeListener(ClusterActivity.this);
+	        }
+
+	        @Override
+	        public void failure(RetrofitError error) {
+	            Toast.makeText(ClusterActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
+	        }
+	    });
 	}
 	
 	public void clusterShow() {
@@ -194,9 +234,7 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 	@Override
 	public void onMapLoaded() {
 		zoom = mMap.getCameraPosition().zoom;
-		clusterShow();
-		setUpMap();
-		mMap.setOnCameraChangeListener(this);
+		getScenics();
 	}
 	
 	@Override

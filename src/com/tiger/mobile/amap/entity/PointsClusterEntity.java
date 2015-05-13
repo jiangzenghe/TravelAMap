@@ -30,6 +30,7 @@ public class PointsClusterEntity {
 	private Double Lng;
 	private Double Lat;
 	private String text;
+	private String title;
 	private String clusterId;
 	private List<ScenicModel> subScenicEntity = new ArrayList<ScenicModel>();
 
@@ -51,7 +52,9 @@ public class PointsClusterEntity {
 //		new LatLng(point.x - gridSize, point.y + gridSize);
 		LatLng northeastPoint = aMap.getProjection().fromScreenLocation(new Point(point.x + gridSize, point.y - gridSize));
 //		new LatLng(point.x + gridSize, point.y - gridSize);
-		boundsEnv = new LatLngBounds(southwestPoint, northeastPoint);
+		if(southwestPoint.longitude<northeastPoint.longitude && southwestPoint.latitude<northeastPoint.latitude) {
+			boundsEnv = new LatLngBounds(southwestPoint, northeastPoint);
+		}
 	}
 
 	/**
@@ -126,6 +129,14 @@ public class PointsClusterEntity {
 
 	public void setSubEventEntity(List<ScenicModel> subScenicEntity) {
 		this.subScenicEntity = subScenicEntity;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 }
