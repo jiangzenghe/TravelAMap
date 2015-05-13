@@ -2,12 +2,18 @@
 package com.tiger.mobile.amap.util;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 import android.annotation.SuppressLint;
 
 import com.amap.api.maps.model.LatLng;
+import com.tiger.mobile.amap.ApiClient;
 import com.tiger.mobile.amap.entity.City;
 import com.tiger.mobile.amap.entity.ScenicModel;
+import com.tiger.mobile.amap.remote.model.CityInfoJson;
 
 @SuppressLint("NewApi")
 public class CityScenicUtils
@@ -49,7 +55,25 @@ public class CityScenicUtils
     }
 
     public static ArrayList<City> createCities() {
-    	ArrayList<City> cityLists = new ArrayList<City>();
+    	final ArrayList<City> cityLists = new ArrayList<City>();
+    	
+//    	ApiClient.getIuuApiClient().getCityList(new Callback<List<CityInfoJson>>() {
+//	        @Override
+//	        public void success(List<CityInfoJson> resultJson, Response response) {
+//	        	if(resultJson == null) {
+//	        	}
+//	        	for(CityInfoJson each:resultJson) {
+//	        		City object = new City(each.getCityname(), each.getPinyin());
+//	            	object.setCityPosition(new LatLng(39.943436, 116.323242));
+//	        		cityLists.add(object);
+//	        	}
+//	        }
+//
+//	        @Override
+//	        public void failure(RetrofitError error) {
+//	        	
+//	        }
+//	    });
     	City object0 = new City("北京", "beijing");
     	object0.setCityPosition(new LatLng(39.943436, 116.323242));
     	cityLists.add(object0);

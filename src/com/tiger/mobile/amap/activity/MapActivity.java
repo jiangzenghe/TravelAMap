@@ -53,6 +53,7 @@ import com.amap.api.maps.model.GroundOverlayOptions;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.Marker;
+import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.maps.model.PolylineOptions;
 import com.amap.api.maps.model.VisibleRegion;
@@ -78,8 +79,9 @@ import com.tiger.mobile.amap.view.GridView;
 /**
  * AMapV1地图demo总汇
  */
-public final class MapActivity extends Activity implements OnCameraChangeListener, OnMapLoadedListener,
-	LocationSource, AMapLocationListener, OnMarkerClickListener, InfoWindowAdapter, AMapNaviListener, OnInfoWindowClickListener{
+public final class MapActivity extends Activity implements OnMarkerClickListener, OnInfoWindowClickListener, 
+	InfoWindowAdapter, OnCameraChangeListener, OnMapLoadedListener, LocationSource, 
+	AMapLocationListener, AMapNaviListener {
 
 	private AMap mMap;
 	private MapView mapView;
@@ -126,6 +128,8 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 		mapView = (MapView) findViewById(R.id.map);
 		mapView.onCreate(savedInstanceState);// 此方法必须重写
 		
+		init();
+		
 		mScreenWidth = Utils.getWindowsWidth(this);
 		mItemWidth = mScreenWidth / 4;
 		routeList = new ArrayList<PointModel>();
@@ -142,7 +146,7 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 
 	private void initView() {
 		mAMapNavi = AMapNavi.getInstance(this);
-		mAMapNavi.setAMapNaviListener(this);
+//		mAMapNavi.setAMapNaviListener(this);
 		rl_column = (RelativeLayout) findViewById(R.id.rl_column);
 		redAlert = (TextView) findViewById(R.id.text_redalert);
 		layout_redalert = (LinearLayout) findViewById(R.id.layout_redalert);
@@ -310,6 +314,18 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
                         			ImageView imageMapLinePoint = (ImageView) v.findViewById(R.id.image_map_line_point);
                                     imageMapLinePoint
                                           .setImageResource(R.drawable.img_map_point_choice);
+                                    MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f)
+                    						.position(new LatLng(37.52035611111111,121.35697888888889));
+                                    arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.hotviewport_nosel_map));
+                                    arg0.title("");
+                                    Marker eachMarker = mMap.addMarker(arg0);
+                                    eachMarker.setObject("1");
+                                    MarkerOptions arg1 = new MarkerOptions().anchor(0.5f, 1.0f)
+                    						.position(new LatLng(37.53035611111111,121.36697888888889));
+                                    arg1.icon(BitmapDescriptorFactory.fromResource(R.drawable.hotviewport_nosel_map));
+                                    arg1.title("");
+                                    Marker eachMarker1 = mMap.addMarker(arg1);
+                                    eachMarker1.setObject("2");
                         		}
                         	}
                         }
@@ -372,8 +388,10 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
 				String item = adapter.getItem(arg2);
-				markerUtils.removeAllAddition();
-				markerUtils.addMarkerGrphic(item);
+				if(markerUtils!=null) {
+					markerUtils.removeAllAddition();
+					markerUtils.addMarkerGrphic(item);
+				}
 				
 			}
 			
@@ -403,14 +421,15 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 	private void init() {
 		if (mMap == null) {
 			mMap = mapView.getMap();
-			setUpMap();
-			mMap.setOnCameraChangeListener(this);
 			mMap.setOnMapLoadedListener(this);
 			mMap.setOnMarkerClickListener(this);// 设置点击marker事件监听器
-			mMap.setInfoWindowAdapter(this);// 设置自定义InfoWindow样式
 			mMap.setOnInfoWindowClickListener(this);// 设置点击infoWindow事件监听器
+			mMap.setInfoWindowAdapter(this);// 设置自定义InfoWindow样式
+			mMap.setOnCameraChangeListener(this);
 			mMap.getUiSettings().setCompassEnabled(false);
 			mMap.getUiSettings().setZoomControlsEnabled(false);
+			
+			setUpMap();
 		}
 		
 	}
@@ -564,7 +583,6 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 	protected void onResume() {
 		super.onResume();
 		mapView.onResume();
-		init();
 	}
 
 	/**
@@ -650,10 +668,7 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 	 */
 	@Override
 	public void onInfoWindowClick(Marker marker) {
-		if(marker.getObject() != null) {//1marker			
-			marker.showInfoWindow();
-		}
-		ToastUtil.show(this, "你点击了infoWindow窗口" + marker.getTitle());
+		
 	}
 	
 	@Override
@@ -662,8 +677,8 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 //		if(arg0.getObject() != null) {//1marker
 //			
 //		}
-		if(arg0.getObject() != null) {//1marker			
-			arg0.showInfoWindow();
+		if(arg0.getObject() != null) {//1marker	
+			
 		}
 		return false;
 	}
@@ -675,16 +690,22 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 		final TextView voiceView = (TextView) view.findViewById(R.id.voice);
 		final TextView naviView = (TextView) view.findViewById(R.id.navi);
 		
-		final ScenicPointJson point = (ScenicPointJson)marker.getObject();
-		if(point.getSpotType().equals("1")) {
+//		final ScenicPointJson point = (ScenicPointJson)marker.getObject();
+		String point = (String)marker.getObject();
+		if(point.equals("1")) {//point.getSpotType()
 			voiceView.setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
+					ToastUtil.show(MapActivity.this, "yinyue");
 					Palyer player = new Palyer();
+//					player.playUrl(Environment.getExternalStorageDirectory().getAbsolutePath()
+//							+"/Music/anyone of us.mp3");
+//					player.playUrl(Environment.getExternalStorageDirectory().getAbsolutePath()
+//							+"/Music/Appologize.mp3");
 					player.playUrl(Environment.getExternalStorageDirectory().getAbsolutePath()
-							+"/Music/anyone of us.mp3");
+							+"/Samsung/Music/Over_the_horizon.mp3");
 				}
 			
 			});
@@ -696,7 +717,7 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				mNaviEnd = new NaviLatLng(point.getLat(), point.getLng());
+//				mNaviEnd = new NaviLatLng(point.getLat(), point.getLng());
 				calculateFootRoute();
 			}
 			
@@ -711,6 +732,8 @@ public final class MapActivity extends Activity implements OnCameraChangeListene
 			if (!isSuccess) {
 				ToastUtil.show(this, "路线计算失败,检查参数情况");
 			}
+		} else {
+			ToastUtil.show(this, "失败,wuqingshidian");
 		}
 	}
 	

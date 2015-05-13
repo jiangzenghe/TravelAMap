@@ -17,10 +17,17 @@ public class CityInfoJson implements java.io.Serializable{
 		@Override
 	public String toString() {
 		return "CityInfoJson [cityid=" + cityid + ", cityname=" + cityname
-				+ "]";
+				+ ",pinyin:"+pinyin+"]";
 	}
+		public String getPinyin() {
+			return pinyin;
+		}
+		public void setPinyin(String pinyin) {
+			this.pinyin = pinyin;
+		}
 		private String cityid;    
 		private String cityname;
+		private String pinyin;
 	}
 
 

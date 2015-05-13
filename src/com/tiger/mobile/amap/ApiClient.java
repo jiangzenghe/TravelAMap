@@ -15,6 +15,7 @@ import retrofit.http.Path;
 import retrofit.http.Query;
 import retrofit.mime.TypedFile;
 
+import com.tiger.mobile.amap.remote.model.CityInfoJson;
 import com.tiger.mobile.amap.remote.model.RecommendLine;
 import com.tiger.mobile.amap.remote.model.ScenicAreaJson;
 import com.tiger.mobile.amap.remote.model.ScenicDetailJson;
@@ -84,6 +85,8 @@ public class ApiClient {
         void queryScenicSpotLists(@Query("scenicId") String scenicId, Callback<List<ScenicPointJson>> callback);
         @GET("/map/recommendLine.do")
         void queryRecommendLines(@Query("scenicId") String scenicId, Callback<List<RecommendLine>> callback);
+        @GET("/home/citylist.do")
+        void getCityList( Callback<List<CityInfoJson>> callback);
         
        @Multipart
         @Headers({"Content-Type: image/jpeg"})
