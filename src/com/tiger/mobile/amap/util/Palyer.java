@@ -4,8 +4,7 @@ import android.media.MediaPlayer;
 import android.util.Log;
 import java.io.IOException;
 
-public class Palyer
-    implements MediaPlayer.OnCompletionListener
+public class Palyer implements MediaPlayer.OnCompletionListener
 {
     public static interface OnMediaPlayerStatuListener
     {
@@ -19,6 +18,33 @@ public class Palyer
         public abstract void stopStatu();
     }
 
+    private class OnMediaPlayerStatuListenerImpl implements OnMediaPlayerStatuListener{
+
+		@Override
+		public void onCompletion() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void pauseStatu() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void playStatu() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void stopStatu() {
+			// TODO Auto-generated method stub
+			
+		}
+    	
+    }
 
     public MediaPlayer mediaPlayer;
     private OnMediaPlayerStatuListener mediaPlayerStatuListener;
@@ -29,6 +55,7 @@ public class Palyer
     {
         status = -1;
         mediaPlayer = new MediaPlayer();
+        mediaPlayerStatuListener = new OnMediaPlayerStatuListenerImpl();
         try
         {
             mediaPlayer.setAudioStreamType(3);
@@ -41,21 +68,7 @@ public class Palyer
         }
     }
 
-    public void backwrardFun()
-    {
-        mediaPlayer.seekTo(-15000 + mediaPlayer.getCurrentPosition());
-    }
-
-    public String getPath()
-    {
-        return path;
-    }
-
-    public int getStatus()
-    {
-        return status;
-    }
-
+    @Override
     public void onCompletion(MediaPlayer mediaplayer)
     {
         if (mediaPlayer != null)
@@ -66,31 +79,7 @@ public class Palyer
         }
     }
 
-    public void ondestroy()
-    {
-        if (mediaPlayer != null)
-        {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
-    }
-
-    public void pause()
-    {
-        if (mediaPlayer != null)
-        {
-            if (mediaPlayer.isPlaying())
-            {
-                mediaPlayer.pause();
-                mediaPlayerStatuListener.pauseStatu();
-            }
-            setStatus(1);
-        }
-    }
-
-    public void play()
-    {
+    public void play() {
         try
         {
             mediaPlayer.start();
@@ -107,14 +96,16 @@ public class Palyer
         }
     }
 
-    public void playUrl(String s)
-    {
+    public void playUrl(String s) {
         try
         {
             mediaPlayer.reset();
             mediaPlayer.setDataSource(s);
             setPath(s);
             mediaPlayer.prepare();
+            mediaPlayer.start();//加播放
+            mediaPlayerStatuListener.playStatu();
+            setStatus(0);
             return;
         }
         catch (IllegalArgumentException illegalargumentexception)
@@ -138,6 +129,36 @@ public class Palyer
         }
     }
 
+    public void pause() {
+        if (mediaPlayer != null)
+        {
+            if (mediaPlayer.isPlaying())
+            {
+                mediaPlayer.pause();
+                mediaPlayerStatuListener.pauseStatu();
+            }
+            setStatus(1);
+        }
+    }
+    
+    public void stop() {
+        if (mediaPlayer != null)
+        {
+            mediaPlayer.stop();
+            mediaPlayerStatuListener.stopStatu();
+            setStatus(2);
+        }
+    }
+    
+    public void ondestroy() {
+        if (mediaPlayer != null)
+        {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
+    
     public void setOnMediaPlayerStatuListener(OnMediaPlayerStatuListener onmediaplayerstatulistener)
     {
         mediaPlayerStatuListener = onmediaplayerstatulistener;
@@ -153,13 +174,19 @@ public class Palyer
         status = i;
     }
 
-    public void stop()
+    public String getPath()
     {
-        if (mediaPlayer != null)
-        {
-            mediaPlayer.stop();
-            mediaPlayerStatuListener.stopStatu();
-            setStatus(2);
-        }
+        return path;
     }
+
+    public int getStatus()
+    {
+        return status;
+    }
+    
+    public void backwrardFun()
+    {
+        mediaPlayer.seekTo(-15000 + mediaPlayer.getCurrentPosition());
+    }
+    
 }

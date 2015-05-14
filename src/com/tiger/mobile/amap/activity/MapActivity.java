@@ -55,6 +55,7 @@ import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.Marker;
 import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
+import com.amap.api.maps.model.Polyline;
 import com.amap.api.maps.model.PolylineOptions;
 import com.amap.api.maps.model.VisibleRegion;
 import com.amap.api.navi.AMapNavi;
@@ -64,12 +65,12 @@ import com.amap.api.navi.model.AMapNaviLocation;
 import com.amap.api.navi.model.AMapNaviPath;
 import com.amap.api.navi.model.NaviInfo;
 import com.amap.api.navi.model.NaviLatLng;
-import com.amap.api.navi.view.RouteOverLay;
 import com.tiger.mobile.amap.ApiClient;
 import com.tiger.mobile.amap.R;
 import com.tiger.mobile.amap.adapter.TestAdapter;
-import com.tiger.mobile.amap.entity.PointModel;
+import com.tiger.mobile.amap.remote.model.RecommendLine;
 import com.tiger.mobile.amap.remote.model.ScenicPointJson;
+import com.tiger.mobile.amap.remote.model.SpotInfo;
 import com.tiger.mobile.amap.util.MarkerUtils;
 import com.tiger.mobile.amap.util.Palyer;
 import com.tiger.mobile.amap.util.ToastUtil;
@@ -97,24 +98,22 @@ public final class MapActivity extends Activity implements OnMarkerClickListener
 	private RelativeLayout rl_column;
 	private TextView redAlert;
 	private LinearLayout layout_redalert;
-	/** 当前选中的栏目*/
-	private int columnSelectIndex = 0;
 	
 	private float zoom;
-//	private NaviLatLng mNaviEnd = new NaviLatLng(37.5206,121.358);
 	private NaviLatLng mNaviEnd;
 	private NaviLatLng mNaviStart;
+	private Marker mMarkerRouteStart;
+	private Marker mMarkerRouteEnd;
+	private Palyer player;
 	// 规划线路
-	private RouteOverLay mRouteOverLay;
+//	private RouteOverLay mRouteOverLay;
+	private Polyline lineDraw;
 	
 	/** 分类列表*/
-	private ArrayList<PointModel> routeList=new ArrayList<PointModel>();
+	private ArrayList<RecommendLine> routeList=new ArrayList<RecommendLine>();
+	private ArrayList<SpotInfo> spotList=new ArrayList<SpotInfo>();
 	private ArrayList<ScenicPointJson> markerList=new ArrayList<ScenicPointJson>();
 	private MarkerUtils markerUtils;
-	/** 屏幕宽度 */
-	private int mScreenWidth = 0;
-	/** Item宽度 */
-	private int mItemWidth = 0;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -130,23 +129,53 @@ public final class MapActivity extends Activity implements OnMarkerClickListener
 		
 		init();
 		
-		mScreenWidth = Utils.getWindowsWidth(this);
-		mItemWidth = mScreenWidth / 4;
-		routeList = new ArrayList<PointModel>();
-		markerList = new ArrayList<ScenicPointJson>();
-		routeList.add(new PointModel(new LatLng(37.5206,121.358),"1","点1"));
-		routeList.add(new PointModel(new LatLng(37.52035611111111,121.35697888888889),"2","点2"));
-		routeList.add(new PointModel(new LatLng(37.52030416666667,121.3575125),"3","点3"));
-		routeList.add(new PointModel(new LatLng(37.52028694444444,121.35767722222222),"4","点4"));
-		routeList.add(new PointModel(new LatLng(37.52028194444444,121.35767777777778),"5","点5"));
-		routeList.add(new PointModel(new LatLng(37.520381666666665,121.357695),"6","点6"));
-		routeList.add(new PointModel(new LatLng(37.52054638888889,121.35772527777777),"7","点7"));
+		initRouteList();
+		
 		initView();
 	}
 
+	private void removeRoute() {
+		if(lineDraw != null) {
+			lineDraw.remove();
+		}
+		if(mMarkerRouteStart!=null) {			
+			mMarkerRouteStart.remove();
+		}
+		if(mMarkerRouteEnd!=null) {
+//			mRouteOverLay.removeFromMap();
+			mMarkerRouteEnd.remove();
+		}
+	}
+	
+	private void initRouteList() {
+		routeList.clear();
+		ApiClient.getIuuApiClient().queryRecommendLines("394", new Callback<List<RecommendLine>>() {
+	        @Override
+	        public void success(List<RecommendLine> resultJson, Response response) {
+	        	Toast.makeText(MapActivity.this, "加载成功", Toast.LENGTH_SHORT).show();
+	        	if(resultJson == null) {
+	        		Toast.makeText(MapActivity.this, "结果为空", Toast.LENGTH_SHORT).show();
+	        	}
+	        	for(RecommendLine each:resultJson) {
+	        		if(each.getLineName().equals("经典路线")) {
+	        			routeList.add(0, each);
+	        		} else {
+	        			routeList.add(1, each);
+	        		}
+	        	}
+	        }
+
+	        @Override
+	        public void failure(RetrofitError error) {
+	            Toast.makeText(MapActivity.this, "加载失败", Toast.LENGTH_SHORT).show();
+	        }
+	    });
+	}
+	
 	private void initView() {
+		player = new Palyer();
 		mAMapNavi = AMapNavi.getInstance(this);
-//		mAMapNavi.setAMapNaviListener(this);
+		mAMapNavi.setAMapNaviListener(this);
 		rl_column = (RelativeLayout) findViewById(R.id.rl_column);
 		redAlert = (TextView) findViewById(R.id.text_redalert);
 		layout_redalert = (LinearLayout) findViewById(R.id.layout_redalert);
@@ -204,8 +233,9 @@ public final class MapActivity extends Activity implements OnMarkerClickListener
 						@Override
 						public void onClick(View v) {
 							if(pop.isShowing()) pop.dismiss();
-							mRouteOverLay.removeFromMap();
-							initColumn();
+							
+							removeRoute();
+							initColumn("1");
 							Drawable nav_down=getResources().getDrawable(R.drawable.downarrow);
 							nav_down.setBounds(0, 0, nav_down.getMinimumWidth(), nav_down.getMinimumHeight());
 							routeText.setCompoundDrawables(nav_down,null,null,null);
@@ -215,13 +245,18 @@ public final class MapActivity extends Activity implements OnMarkerClickListener
 	    					rl_column.setVisibility(View.VISIBLE);
 	    					
 	    					ArrayList<LatLng> arg1 = new ArrayList<LatLng>();
-	    					for(PointModel each:routeList) {
-	    						arg1.add(each.getLatLng());
+	    					for(SpotInfo each:spotList) {
+	    						arg1.add(new LatLng(each.getLat(),each.getLng()));
 //	    						mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f).position(new LatLng(each.getLatitude(),each.getLongitude())));
 	    					}
-	    					mMap.addPolyline(new PolylineOptions().addAll(arg1).color(Color.RED).visible(true));
-	    					mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-	    							arg1.get(0), 18));  //37.5206,121.358
+	    					if(arg1.size() != 0) {	    						
+	    						lineDraw = mMap.addPolyline(new PolylineOptions().zIndex(10)
+	    								.addAll(arg1).color(Color.RED).visible(true));
+	    						mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+	    								arg1.get(0), 18));  //37.5206,121.358
+	    					} else {
+	    						rl_column.setVisibility(View.GONE);
+	    					}
 						}
                     	
                     });
@@ -230,8 +265,8 @@ public final class MapActivity extends Activity implements OnMarkerClickListener
 						@Override
 						public void onClick(View v) {
 							if(pop.isShowing()) pop.dismiss();
-							mRouteOverLay.removeFromMap();
-							initColumn();
+							removeRoute();
+							initColumn("2");
 							Drawable nav_down=getResources().getDrawable(R.drawable.downarrow);
 							nav_down.setBounds(0, 0, nav_down.getMinimumWidth(), nav_down.getMinimumHeight());
 							routeText.setCompoundDrawables(nav_down,null,null,null);
@@ -239,6 +274,20 @@ public final class MapActivity extends Activity implements OnMarkerClickListener
 	                    	Animation mShowAction = AnimationUtils.loadAnimation(MapActivity.this, R.anim.right_in);
 	    					rl_column.setAnimation(mShowAction);
 	    					rl_column.setVisibility(View.VISIBLE);
+	    					
+	    					ArrayList<LatLng> arg1 = new ArrayList<LatLng>();
+	    					for(SpotInfo each:spotList) {
+	    						arg1.add(new LatLng(each.getLat(),each.getLng()));
+//	    						mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f).position(new LatLng(each.getLatitude(),each.getLongitude())));
+	    					}
+	    					if(arg1.size() != 0) {	    						
+	    						lineDraw = mMap.addPolyline(new PolylineOptions().zIndex(10)
+	    								.addAll(arg1).color(Color.RED).visible(true));
+	    						mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+	    								arg1.get(0), 18));  //37.5206,121.358
+	    					} else {
+	    						rl_column.setVisibility(View.GONE);
+	    					}
 						}
                     	
                     });
@@ -269,17 +318,32 @@ public final class MapActivity extends Activity implements OnMarkerClickListener
 			}
 		});
 		
-		initColumn();
 		initGridView();
 	}
 	
 	/** 
 	 *  初始化Column栏目项
 	 * */
-	private void initColumn() {
+	private void initColumn(String type) { //"1"经典  "2"畅游
 		mRoute_layout.removeAllViews();
-		int count =  routeList.size();
-		mColumnHorizontalScrollView.setParam(this, mScreenWidth, mRoute_layout, rl_column);
+		spotList.clear();
+		RecommendLine line;
+		if(type.equals("1")&&routeList!=null) {
+			line = routeList.get(0);
+		} else {
+			if(routeList.size()>1) {				
+				line = routeList.get(1);
+			} else {
+				return;
+			}
+		}
+		int count = 0;
+		if(line!=null&&line.getLineSectionList()!=null) {
+			for(SpotInfo each : line.getLineSectionList()) {
+				spotList.add(each);
+			}
+			count =  line.getLineSectionList().size();
+		}
 		LayoutInflater  inflater=LayoutInflater.from(this);
 		for(int i = 0; i< count; i++){
 			// 动态添加景点布局
@@ -288,7 +352,7 @@ public final class MapActivity extends Activity implements OnMarkerClickListener
             linearLayoutMapLineItem.setTag(i);
             TextView textMapLineTitle = (TextView) linearLayoutMapLineItem
                     .findViewById(R.id.text_map_line_title);
-            textMapLineTitle.setText(routeList.get(i).getScenicName());
+            textMapLineTitle.setText(spotList.get(i).getSpotName());
             ImageView imageMapLinePoint = (ImageView) linearLayoutMapLineItem
                     .findViewById(R.id.image_map_line_point);
          // index等于0代表为线路上的第一个点
@@ -314,18 +378,9 @@ public final class MapActivity extends Activity implements OnMarkerClickListener
                         			ImageView imageMapLinePoint = (ImageView) v.findViewById(R.id.image_map_line_point);
                                     imageMapLinePoint
                                           .setImageResource(R.drawable.img_map_point_choice);
-                                    MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f)
-                    						.position(new LatLng(37.52035611111111,121.35697888888889));
-                                    arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.hotviewport_nosel_map));
-                                    arg0.title("");
-                                    Marker eachMarker = mMap.addMarker(arg0);
-                                    eachMarker.setObject("1");
-                                    MarkerOptions arg1 = new MarkerOptions().anchor(0.5f, 1.0f)
-                    						.position(new LatLng(37.53035611111111,121.36697888888889));
-                                    arg1.icon(BitmapDescriptorFactory.fromResource(R.drawable.hotviewport_nosel_map));
-                                    arg1.title("");
-                                    Marker eachMarker1 = mMap.addMarker(arg1);
-                                    eachMarker1.setObject("2");
+                                    LatLng center = new LatLng(spotList.get(i).getLat(), spotList.get(i).getLng());
+                                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                    		center, 18));  //37.5206,121.358
                         		}
                         	}
                         }
@@ -447,7 +502,7 @@ public final class MapActivity extends Activity implements OnMarkerClickListener
 		mMap.setMyLocationStyle(myLocationStyle);// 将自定义的 myLocationStyle 对象添加到地图上
 		mMap.setLocationSource(this);// 设置定位监听 //设置定位资源。如果不设置此定位资源则定位按钮不可点击。
 		mMap.getUiSettings().setMyLocationButtonEnabled(true);// 设置默认定位按钮是否显示
-		mMap.setMyLocationEnabled(false);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
+		mMap.setMyLocationEnabled(true);// 设置为true表示显示定位层并可触发定位，false表示隐藏定位层并不可触发定位，默认是false
  
 	}
 	
@@ -529,7 +584,7 @@ public final class MapActivity extends Activity implements OnMarkerClickListener
 	 * 往地图上添加一个groundoverlay覆盖物
 	 */
 	private void addOverlayToMap() {
-		mRouteOverLay = new RouteOverLay(mMap, null);
+//		mRouteOverLay = new RouteOverLay(mMap, null);
 		LatLngBounds bounds = new LatLngBounds.Builder()
         .include(new LatLng(36.1377,120.6737))
 		.include(new LatLng(36.1415,120.677862)).build();
@@ -610,6 +665,7 @@ public final class MapActivity extends Activity implements OnMarkerClickListener
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		player.ondestroy();
 		mapView.onDestroy();
 	}
 	
@@ -668,15 +724,14 @@ public final class MapActivity extends Activity implements OnMarkerClickListener
 	 */
 	@Override
 	public void onInfoWindowClick(Marker marker) {
-		
+		if(player.getStatus() == 0) {
+			player.stop();
+		}
 	}
 	
 	@Override
 	public boolean onMarkerClick(Marker arg0) {
 		// TODO Auto-generated method stub
-//		if(arg0.getObject() != null) {//1marker
-//			
-//		}
 		if(arg0.getObject() != null) {//1marker	
 			
 		}
@@ -690,22 +745,25 @@ public final class MapActivity extends Activity implements OnMarkerClickListener
 		final TextView voiceView = (TextView) view.findViewById(R.id.voice);
 		final TextView naviView = (TextView) view.findViewById(R.id.navi);
 		
-//		final ScenicPointJson point = (ScenicPointJson)marker.getObject();
-		String point = (String)marker.getObject();
-		if(point.equals("1")) {//point.getSpotType()
+		final ScenicPointJson point = (ScenicPointJson)marker.getObject();
+//		String point = (String)marker.getObject();
+		if(point.getSpotType().equals("1")) {//point.getSpotType()
+			voiceView.setTag(point.getScenicId());
 			voiceView.setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View v) {
 					// TODO Auto-generated method stub
-					ToastUtil.show(MapActivity.this, "yinyue");
-					Palyer player = new Palyer();
 //					player.playUrl(Environment.getExternalStorageDirectory().getAbsolutePath()
 //							+"/Music/anyone of us.mp3");
+					if(player.getStatus() != 0) {
+						player.playUrl(Environment.getExternalStorageDirectory().getAbsolutePath()
+								+"/Music/bells_of_freedom.mp3");
+					} else if(player.getStatus() == 0) {
+						player.stop();
+					}
 //					player.playUrl(Environment.getExternalStorageDirectory().getAbsolutePath()
-//							+"/Music/Appologize.mp3");
-					player.playUrl(Environment.getExternalStorageDirectory().getAbsolutePath()
-							+"/Samsung/Music/Over_the_horizon.mp3");
+//							+"/Samsung/Music/Over_the_horizon.mp3");
 				}
 			
 			});
@@ -717,7 +775,9 @@ public final class MapActivity extends Activity implements OnMarkerClickListener
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-//				mNaviEnd = new NaviLatLng(point.getLat(), point.getLng());
+//				mNaviStart.setLatitude(36.138143);//120.674922,36.138143
+//				mNaviStart.setLongitude(120.674922);
+				mNaviEnd = new NaviLatLng(point.getLat(), point.getLng());
 				calculateFootRoute();
 			}
 			
@@ -733,7 +793,7 @@ public final class MapActivity extends Activity implements OnMarkerClickListener
 				ToastUtil.show(this, "路线计算失败,检查参数情况");
 			}
 		} else {
-			ToastUtil.show(this, "失败,wuqingshidian");
+			ToastUtil.show(this, "失败,起点或终点未设定");
 		}
 	}
 	
@@ -761,24 +821,30 @@ public final class MapActivity extends Activity implements OnMarkerClickListener
 		if (naviPath == null) {
 			return;
 		}
+		removeRoute();
 		List<NaviLatLng> arg0 = naviPath.getCoordList();
 		ArrayList<LatLng> arg1 = new ArrayList<LatLng>();
 		// 获取路径规划线路，显示到地图上
-		mRouteOverLay.setRouteInfo(naviPath);
-		mRouteOverLay.addToMap();
-		mRouteOverLay.drawArrow(arg0);
-//		for(NaviLatLng each:arg0) {
-//			arg1.add(new LatLng(each.getLatitude(),each.getLongitude()));
+//		mRouteOverLay.setRouteInfo(naviPath);
+//		mRouteOverLay.addToMap();
+//		mRouteOverLay.drawArrow(arg0);
+		mMarkerRouteStart = mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f)
+				.icon(BitmapDescriptorFactory.fromResource(R.drawable.start))
+				.position(new LatLng(mNaviStart.getLatitude(),mNaviStart.getLongitude())));
+		mMarkerRouteEnd = mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f)
+				.icon(BitmapDescriptorFactory.fromResource(R.drawable.end))
+				.position(new LatLng(mNaviEnd.getLatitude(),mNaviEnd.getLongitude())));
+		for(NaviLatLng each:arg0) {
+			arg1.add(new LatLng(each.getLatitude(),each.getLongitude()));
 //			mMap.addMarker(new MarkerOptions().anchor(0.5f, 0.5f).position(new LatLng(each.getLatitude(),each.getLongitude())));
-//		}
-//		mMap.addPolyline(new PolylineOptions().addAll(arg1).color(Color.RED).visible(true));
+		}
+		lineDraw = mMap.addPolyline(new PolylineOptions().addAll(arg1).color(Color.RED).visible(true).zIndex(10));
 		
 	}
 
 	@Override
 	public void onEndEmulatorNavi() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

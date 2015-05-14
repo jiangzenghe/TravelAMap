@@ -119,7 +119,7 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 	private void init() {
 		scenicLists = new ArrayList<ScenicModel>();
 		mClusterDatas = new ArrayList<PointsClusterEntity>();
-		
+		getScenics();
 		if (mMap == null) {
 			mMap = mapView.getMap();
 			mMap.setOnMapLoadedListener(this);
@@ -234,7 +234,6 @@ public final class ClusterActivity extends Activity implements OnCameraChangeLis
 	@Override
 	public void onMapLoaded() {
 		zoom = mMap.getCameraPosition().zoom;
-		getScenics();
 	}
 	
 	@Override

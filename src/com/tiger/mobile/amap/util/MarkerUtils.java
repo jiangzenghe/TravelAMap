@@ -95,7 +95,9 @@ public class MarkerUtils {
 				MarkerOptions arg1 = new MarkerOptions().anchor(0.0f, 0.5f)
 						.position(new LatLng(each.getLat(), each.getLng()));
 				arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.hotviewport_nosel_map));
-				arg1.icon(BitmapDescriptorFactory.fromBitmap(getBitMap(each.getScenicPointName(),R.drawable.hotviewport_transparent)));
+				arg1.icon(BitmapDescriptorFactory.fromBitmap(
+						getBitMap(each.getScenicPointName(),R.drawable.hotviewport_transparent_long)));
+				arg0.title(each.getScenicPointName());
 				Marker eachMarker = aMap.addMarker(arg0);
 				Marker eachMarker_add = aMap.addMarker(arg1);
 				eachMarker.setObject(each);//1--景区标志
@@ -106,6 +108,7 @@ public class MarkerUtils {
 				MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f)
 						.position(new LatLng(each.getLat(), each.getLng()));
 				arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.anno_cesuo));
+				arg0.title(each.getScenicPointName());
 				Marker eachMarker = aMap.addMarker(arg0);
 				eachMarker.setObject(each);//1--景区标志
 			}
@@ -113,6 +116,7 @@ public class MarkerUtils {
 			for (ScenicPointJson each : selectPointsList){
 				MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f)
 						.position(new LatLng(each.getLat(), each.getLng()));
+				arg0.title(each.getScenicPointName());
 				arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.anno_lanche));
 				Marker eachMarker = aMap.addMarker(arg0);
 				eachMarker.setObject(each);//1--景区标志
@@ -121,6 +125,7 @@ public class MarkerUtils {
 			for (ScenicPointJson each : selectPointsList){
 				MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f)
 						.position(new LatLng(each.getLat(), each.getLng()));
+				arg0.title(each.getScenicPointName());
 				arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.anno_matou));
 				Marker eachMarker = aMap.addMarker(arg0);
 				eachMarker.setObject(each);//1--景区标志
@@ -129,6 +134,7 @@ public class MarkerUtils {
 			for (ScenicPointJson each : selectPointsList){
 				MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f)
 						.position(new LatLng(each.getLat(), each.getLng()));
+				arg0.title(each.getScenicPointName());
 				arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.anno_kefu));
 				Marker eachMarker = aMap.addMarker(arg0);
 				eachMarker.setObject(each);//1--景区标志
@@ -137,6 +143,7 @@ public class MarkerUtils {
 			for (ScenicPointJson each : selectPointsList){
 				MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f)
 						.position(new LatLng(each.getLat(), each.getLng()));
+				arg0.title(each.getScenicPointName());
 				arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.anno_tingchechang));
 				Marker eachMarker = aMap.addMarker(arg0);
 				eachMarker.setObject(each);//1--景区标志
@@ -145,6 +152,7 @@ public class MarkerUtils {
 			for (ScenicPointJson each : selectPointsList){
 				MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f)
 						.position(new LatLng(each.getLat(), each.getLng()));
+				arg0.title(each.getScenicPointName());
 				arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.anno_huancheng));
 				Marker eachMarker = aMap.addMarker(arg0);
 				eachMarker.setObject(each);//1--景区标志
@@ -153,6 +161,7 @@ public class MarkerUtils {
 			for (ScenicPointJson each : selectPointsList){
 				MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f)
 						.position(new LatLng(each.getLat(), each.getLng()));
+				arg0.title(each.getScenicPointName());
 				arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.anno_shoupiao));
 				Marker eachMarker = aMap.addMarker(arg0);
 				eachMarker.setObject(each);//1--景区标志
@@ -161,6 +170,7 @@ public class MarkerUtils {
 			for (ScenicPointJson each : selectPointsList){
 				MarkerOptions arg0 = new MarkerOptions().anchor(0.5f, 1.0f)
 						.position(new LatLng(each.getLat(), each.getLng()));
+				arg0.title(each.getScenicPointName());
 				arg0.icon(BitmapDescriptorFactory.fromResource(R.drawable.anno_churukou));
 				Marker eachMarker = aMap.addMarker(arg0);
 				eachMarker.setObject(each);//1--景区标志
@@ -189,7 +199,7 @@ public class MarkerUtils {
 				Canvas canvas = new Canvas(bitmap);
 				TextPaint textPaint = new TextPaint();
 				textPaint.setTextSize(20f);
-				textPaint.setColor(Color.RED);
+				textPaint.setColor(Color.BLACK);
 				canvas.drawText(text, 22, 18, textPaint);// 设置bitmap上面的文字位置
 		return bitmap;
 	}
